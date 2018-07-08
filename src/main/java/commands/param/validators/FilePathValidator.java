@@ -1,0 +1,24 @@
+package commands.param.validators;
+
+import commands.param.ParameterValidator;
+
+import java.io.File;
+
+public class FilePathValidator extends ParameterValidator {
+
+    @Override
+    public String validate(String par) {
+
+        File f = new File(par);
+        if (!f.exists())
+            return "file '"+par+"' does not exist";
+        if (f.isDirectory())
+            return "'"+par+"' is a directory";
+        return null;
+    }
+
+    @Override
+    public String toString() {
+        return "FILE PATH";
+    }
+}
