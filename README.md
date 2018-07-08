@@ -19,34 +19,42 @@ In the following sections we will use git to clone the repositories. But you can
 
 #### IOTA Library
 
-    cd /path/to/your/favourite/directory/
-    git clone https://github.com/iotaledger/iota.lib.java
-    cd iota.lib.java/
-    mvn install
+```shell
+cd /path/to/your/favourite/directory/
+git clone https://github.com/iotaledger/iota.lib.java
+cd iota.lib.java/
+mvn install
+```
     
 #### Qlite Library
 
-    cd /path/to/your/favourite/directory/
-    git clone https://github.com/qubiclite/qlite.lib.java
-    cd qlite.lib.java/  
-    mvn versions:use-latest-versions -DallowSnapshots=true -DexcludeReactor=false
-    mvn install
+```shell
+cd /path/to/your/favourite/directory/
+git clone https://github.com/qubiclite/qlite.lib.java
+cd qlite.lib.java/  
+mvn versions:use-latest-versions -DallowSnapshots=true -DexcludeReactor=false
+mvn install
+```
     
 ### 3) Installing the QLRI
 
-    cd /path/to/your/favourite/directory/
-    git clone https://github.com/qubiclite/qlri
-    cd qlri/
-    mvn versions:use-latest-versions -DallowSnapshots=true -DexcludeReactor=false
-    mvn install
-    
+```shell
+cd /path/to/your/favourite/directory/
+git clone https://github.com/qubiclite/qlri
+cd qlri/
+mvn versions:use-latest-versions -DallowSnapshots=true -DexcludeReactor=false
+mvn install
+```
+
 If everything went successfully, you should now find a runnable jar file called `qlri-[VERSION].jar` in the `qlri/` directory.
     
 ## Running The Jar File
 
 To run the jar file use this command (you will need the **JRE** or **JDK**):
 
-    java -jar qlri-[VERSION].jar
+``` shell
+java -jar qlri-[VERSION].jar
+```
     
 ## Using the QLRI
 
