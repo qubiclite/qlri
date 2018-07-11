@@ -7,6 +7,7 @@ import commands.param.validators.TryteValidator;
 import main.Persistence;
 import oracle.QuorumBasedResult;
 import qlvm.InterQubicResultFetcher;
+import qubic.QubicReader;
 
 public class CommandFetchEpoch extends Command {
 
@@ -44,6 +45,13 @@ public class CommandFetchEpoch extends Command {
         String qubicId = par[1];
         int epoch_min = Integer.parseInt(par[2]);
         int epoch_max = par.length > 3 ? Integer.parseInt(par[3]) : epoch_min;
+
+        int lastCompletedEpoch = new QubicReader(qubicId).lastCompletedEpoch();
+
+        if(epoch_max > lastCompletedEpoch) {
+            println("WARNING: epoch #"+(lastCompletedEpoch+1)+" is still running, only results for epoch <= "+lastCompletedEpoch+" are available.\n");
+            epoch_max = lastCompletedEpoch;
+        }
 
         for(int epoch = epoch_min; epoch <= epoch_max; epoch++) {
 

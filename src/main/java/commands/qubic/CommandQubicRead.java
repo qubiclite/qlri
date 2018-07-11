@@ -44,14 +44,14 @@ public class CommandQubicRead extends Command {
         String qubicId = par[1];
         QubicReader qr = new QubicReader(qubicId);
 
-        println("ID:                  " + qr.getID());
-        println("epoch duration:      " + qr.getEpochDuration() + "s (" + qr.getHashPeriodDuration() + "s + " + qr.getResultPeriodDuration() + "s)");
-        println("execution start:     " + Main.DF.format(1000L * qr.getExecutionStart()) + " (" + qr.getExecutionStart() + ", "+(qr.getExecutionStart()-System.currentTimeMillis()/1000)+"s)");
-        println("application address: " + qr.getApplicationAddress());
+        println("ID:                   " + qr.getID());
+        println("application address:  " + qr.getApplicationAddress());
+        println("epoch duration:       " + qr.getEpochDuration() + "s (" + qr.getHashPeriodDuration() + "s + " + qr.getResultPeriodDuration() + "s)");
+        println("execution start:      " + Main.DF.format(1000L * qr.getExecutionStart()) + " (" + qr.getExecutionStart() + ", "+(qr.getExecutionStart()-System.currentTimeMillis()/1000)+"s)");
 
         long timeRunning = System.currentTimeMillis()/1000-qr.getExecutionStart();
         if(timeRunning > qr.getEpochDuration())
-            println("last finished epoch: #" + (timeRunning / qr.getEpochDuration()));
+            println("last completed epoch: #" + qr.lastCompletedEpoch());
 
         println("");
         println("code:");
