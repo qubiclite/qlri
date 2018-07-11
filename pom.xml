@@ -6,12 +6,18 @@
 
     <groupId>com.qubiota</groupId>
     <artifactId>qlri</artifactId>
-    <version>0.1</version>
+    <version>0.2-SNAPSHOT</version>
     <dependencies>
         <dependency>
             <groupId>org.qubiclite</groupId>
             <artifactId>qlite</artifactId>
-            <version>0.1</version>
+            <version>0.2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <properties>
