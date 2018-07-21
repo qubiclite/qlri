@@ -1,11 +1,17 @@
 package commands.oracle;
 
+import api.resp.general.ResponseAbstract;
+import api.resp.general.ResponseError;
+import api.resp.general.ResponseSuccess;
 import commands.Command;
 import commands.param.CallValidator;
 import commands.param.ParameterValidator;
 import commands.param.validators.TryteValidator;
 import main.Persistence;
 import oracle.OracleWriter;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 public class CommandOraclePause extends Command {
 
@@ -36,14 +42,21 @@ public class CommandOraclePause extends Command {
     }
 
     @Override
-    public void perform(Persistence persistence, String[] par) {
+    public void terminalPostPerformAction(ResponseAbstract response, Persistence persistence, String[] par) {
+        println("pausing oracle after epoch ends");
+    }
 
-        String handle = par[1];
-        OracleWriter ow = persistence.findOracleWriterByHandle(handle);
 
-        if(ow != null) {
-            println("pausing oracle after epoch ends");
-            ow.getManager().terminate();
-        }
+    @Override
+    public ResponseAbstract perform(Persistence persistence, Map<String, Object> parMap) {
+
+        String oracleHandle = (String)parMap.get("oracle_handle");
+        ArrayList<OracleWriter> ows = persistence.findAllOracleWritersWithHandle(oracleHandle);
+
+        if(ows.size() != 1)
+            return new ResponseError("there are "+ows.size()+" oracles with the handle '"+oracleHandle+"'");
+
+        ows.get(0).getManager().terminate();
+        return new ResponseSuccess();
     }
 }

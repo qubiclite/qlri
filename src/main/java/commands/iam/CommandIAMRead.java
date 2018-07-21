@@ -1,5 +1,7 @@
 package commands.iam;
 
+import api.resp.general.ResponseAbstract;
+import api.resp.iam.ResponseIAMRead;
 import commands.Command;
 import commands.param.CallValidator;
 import commands.param.ParameterValidator;
@@ -8,6 +10,8 @@ import commands.param.validators.TryteValidator;
 import main.Persistence;
 import org.json.JSONObject;
 import tangle.IAMReader;
+
+import java.util.Map;
 
 public class CommandIAMRead extends Command {
 
@@ -39,15 +43,20 @@ public class CommandIAMRead extends Command {
     }
 
     @Override
-    public void perform(Persistence persistence, String[] par) {
+    public void terminalPostPerformAction(ResponseAbstract response, Persistence persistence, String[] par) {
+        JSONObject read = ((ResponseIAMRead)response).getRead();
+        println(read == null ? "no message found in this iam stream at the requested index" : read.toString());
+    }
 
-        String iamId = par[1];
-        int index = Integer.parseInt(par[2]);
+    @Override
+    public ResponseAbstract perform(Persistence persistence, Map<String, Object> parMap) {
 
-        println("reading index "+index+" ...");
+        String iamId = (String)parMap.get("iam_id");
+        int index = (int)parMap.get("index");
 
         IAMReader iamReader = new IAMReader(iamId);
         JSONObject read = iamReader.read(index);
-        println(read == null ? "nothing found at index #"+index : read.toString());
+
+        return new ResponseIAMRead(read);
     }
 }

@@ -1,10 +1,14 @@
 package commands;
 
+import api.resp.general.ResponseAbstract;
+import api.resp.general.ResponseSuccess;
 import commands.param.CallValidator;
 import commands.param.ParameterValidator;
 import commands.param.validators.ActionValidator;
 import main.Persistence;
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.Map;
 
 public class CommandHelp extends Command {
 
@@ -12,7 +16,7 @@ public class CommandHelp extends Command {
 
 
     private static final CallValidator CV = new CallValidator(new ParameterValidator[]{
-        new ActionValidator().setName("command").setDescription("command to display specific details to").setExampleValue("qubic_list").makeOptional(),
+        new ActionValidator().setName("command").setDescription("command to display specific details to").setExampleValue("qubic_list").makeOptional(""),
     });
 
     @Override
@@ -36,7 +40,7 @@ public class CommandHelp extends Command {
     }
 
     @Override
-    public void perform(Persistence persistence, String[] par) {
+    public void terminalPostPerformAction(ResponseAbstract response, Persistence persistence, String[] par) {
 
         String command = par.length == 1 ? null : par[1];
 
@@ -64,11 +68,21 @@ public class CommandHelp extends Command {
             println("");
             println("PARAMETERS:");
             println("");
-            println(a.getCallValidator().toString());
+            println(a.getCallValidatorForTerminal().toString());
             println("");
             println("EXAMPLE USE:");
             println("");
-            println("$ " + a.getName() + " " + a.getCallValidator().buildExampleAllocation());
+            println("$ " + a.getName() + " " + a.getCallValidatorForTerminal().buildExampleAllocation());
         }
+    }
+
+    @Override
+    public ResponseAbstract perform(Persistence persistence, Map<String, Object> parMap) {
+        return new ResponseSuccess();
+    }
+
+    @Override
+    public boolean isRemotelyAvailable() {
+        return false;
     }
 }

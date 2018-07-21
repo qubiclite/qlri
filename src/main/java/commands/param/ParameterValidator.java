@@ -5,6 +5,7 @@ public abstract class ParameterValidator {
     private String name;
     private String description;
     private String exampleValue;
+    private Object defValue;
     private boolean optional = false;
 
     public abstract String validate(String par);
@@ -24,10 +25,17 @@ public abstract class ParameterValidator {
         return this;
     }
 
-    public ParameterValidator makeOptional() {
+    public ParameterValidator makeOptional(Object defValue) {
+        this.defValue = defValue;
         optional = true;
         return this;
     }
+
+    public String getJSONKey() {
+        return name.toLowerCase().replace(' ', '_');
+    }
+
+    public abstract Object convertParToObject(String par);
 
     public String getName() {
         return name + (optional ? " [OPTIONAL]" : "");
@@ -39,6 +47,10 @@ public abstract class ParameterValidator {
 
     public String getExampleValue() {
         return exampleValue;
+    }
+
+    public Object getDefaultValue() {
+        return defValue;
     }
 
     public boolean isOptional() {

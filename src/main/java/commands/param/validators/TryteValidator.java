@@ -37,6 +37,11 @@ public class TryteValidator extends ParameterValidator {
     }
 
     @Override
+    public Object convertParToObject(String par) {
+        return par;
+    }
+
+    @Override
     public String toString() {
         return buildRequiredLengthString() + " TRYTES";
     }

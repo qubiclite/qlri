@@ -50,12 +50,43 @@ If everything went successfully, you should now find a runnable jar file called 
     
 ## Running The Jar File
 
+### Default Start
+
 To run the jar file use this command (you will need the **JRE** or **JDK**):
 
 ``` shell
 java -jar qlri-[VERSION].jar
 ```
-    
+
+To make things much more intuitive, it is highly suggest to start the .jar with the `-api` parameter:
+
+``` shell
+java -jar qlri-[VERSION].jar -api
+```
+
+This will start a **qlite web** (a web gui, see [screenshots](#screenshots)) that you can access in your browser by visiting 'http://\[YOUR IP\]:17733'. Additionally you can use `-h localhost` to
+make the GUI available on 'http://localhost:17733' only (recommended as there is no abuse/spam protection yet):
+
+``` shell
+java -jar qlri-[VERSION].jar -api -h localhost
+```
+
+### Parameters
+
+You can pass certain paramters with that line
+
+| parameter | alias | example | default value¹ | what it does
+| --- | --- | --- | --- | ---
+| `-api` | | `-api` | disabled | enables the api and web gui (address will be shown in your terminal)
+| `-port` | `-p` | `-port 17733` | 17733 | sets the port of the api (requires api to be enabled)
+| `-host` | `-h` | `-host localhost` | your ip | sets a custom host for your api instead of the ip (make sure that the host is available!)
+| `-mainnet` | `-mn` | `-mainnet` | testnet | required when you want to connect through mainnet nodes to the mainnet tangle instead of testnet
+| `-node` | `-n` | `-n http://no.de:443` | IF testnet² | changes the iota node that is used to connect to the tangle
+| `-remotepow` | `-rp` | `-remotepow` | disabled | outsources the proof-of-work from your qlri to the remote iota node (requires that node to have remote pow activated)
+
+¹ … default value if you do not pass the respective parameter to your jar file.
+² … https://nodes.testnet.iota.org:443
+
 ## Using the QLRI
 
 ### Creating a new Qubic:
@@ -118,6 +149,11 @@ For specific information to a command (parameter details + example use), use `he
 | `iam_list`                | `il`  | prints the full list of all IAM streams stored in the persistence
 | `iam_write`               | `iw`  | writes a message into the iam stream to a certain index
 | `iam_read`                | `ir`  | reads the message of an IAM stream at a certain index
+
+## Screenshots
+
+<img src="http://qubiclite.org/imgs/screenshots/qlite_web_0.png" alt="ql web, gui for your browser" />
+<img src="http://qubiclite.org/imgs/screenshots/qlri_terminal.png" alt="running the qlri from terminal" />
 
 ## Project Resources
 

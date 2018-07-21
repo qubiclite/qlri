@@ -1,0 +1,442 @@
+* {
+    box-sizing: border-box;
+}
+
+.hidden {
+    display: none !important;
+}
+
+#toast-container {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+body {
+    margin: 0;
+    font-size: 0;
+    font-family: "Cantarell", "Verdana", "Source Sans Pro", "Segoe UI Light", "Arial", "DejaVu Sans", "DejaVu Sans Light", "DejaVu Sans", sans-serif;
+    /*background-image: linear-gradient(to right, #371d00, #370033);*/
+    background-color: #222;
+    color: #444;
+    min-width: 800px;
+}
+
+nav {
+    background-color: rgba(0, 0, 0, 0.2);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-family: "DejaVu Sans Light", "DejaVu Sans", "Segoe UI Light", sans-serif;
+    padding-right: 100px;
+    min-width: 800px;
+}
+
+nav #logo {
+    background-image: url(imgs/logo.png);
+    width: 50px;
+    height: 50px;
+    background-size: 50px;
+    margin: 10px 0 10px 50px;
+    float: left;
+    opacity: 0.6;
+}
+
+nav ul {
+    margin: 0;
+    padding: 0;
+    display: block;
+    vertical-align: top;
+}
+
+nav ul li {
+    display: inline-block;
+    font-size: 18px;
+    padding: 26px 36px;
+    color: #FFF;
+    font-weight: lighter;
+    transition: 0.1s background-color;
+    cursor: pointer;
+}
+
+nav ul li:first-child {
+    border-left: none;
+}
+
+nav ul li:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+header {
+    height: 300px;
+    padding-top: 120px;
+    font-family: "DejaVu Sans Light";
+    background-image: linear-gradient(to right, #6f3a00, #6f0066);
+}
+
+header #suptext,
+header #subtext {
+    font-weight: lighter;
+    color: #FFF;
+    text-align: center;
+}
+
+header #suptext {
+    font-size: 60px;
+    margin-bottom: 10px;
+}
+
+header #subtext {
+    font-size: 16px;
+    margin: 20px auto;
+}
+
+.window_container {
+    background-color: rgba(0, 0, 0, 0.4);
+    position: fixed;
+    height: 100vh;
+    width: 100vw;
+    top: 0;
+    text-align: center;
+    overflow-y: scroll;
+}
+
+.window_container .window {
+    display: inline-block;
+    background-color: #FFF;
+    max-width: 800px;
+    margin: 150px auto 50px auto;
+    border-radius: 5px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    text-align: left;
+}
+
+.window_container .window .window_head {
+    background-image: linear-gradient(to right, #6f3a00, #6f0066);
+    width: 100%;
+    height: 40px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    font-weight: bold;
+    color: #FFF;
+}
+
+.window_container .window .window_head .window_name {
+    display: inline-block;
+    padding: 10px 30px;
+    font-size: 16px;
+}
+
+.window_container .window .window_head .window_close {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-top-right-radius: 5px;
+    height: 40px;
+    width: 40px;
+    display: inline-block;
+    float: right;
+    cursor: pointer;
+    transition: 0.2s background-color;
+    background-image: url('imgs/close_button.png');
+    background-size: 40px 40px;
+}
+
+.window_container .window .window_head .window_close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.window_container .window .window_body {
+    padding: 20px 30px;
+    min-height: 50px;
+}
+
+.window_container .window .window_body p {
+    font-size: 14px;
+}
+
+.scroll {
+    max-height: 400px;
+    overflow-y: auto;
+    border-radius: 5px;
+    padding: 5px 0;
+    width: 640px;
+}
+
+.box {
+    background-color: #FFF;
+    border: 1px solid #EEE;
+    border-top-color: #DDD;
+    border-left-color: #DDD;
+    border-radius: 5px;
+    width: 100%;
+    min-height: 30px;
+    margin: 5px 0;
+    padding: 5px 10px;
+}
+
+.box.code {
+    padding: 10px 20px;
+    font-size: 10px;
+    color: #222;
+    line-height: 1.6em;
+    min-height: 60px;
+    max-width: 640px;
+    font-family: monospace;
+    word-wrap: break-word;
+    white-space: pre;
+    overflow-x: auto;
+}
+
+.box .epoch,
+.box .epoch_result,
+.box .entity_property,
+.box .entity_id {
+    font-size: 10px;
+    font-family: monospace;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    margin: 5px 0;
+}
+
+.box .epoch_result {
+    color: #888;
+    margin-top: 10px;
+}
+
+.box .entity_id {
+    color: #000;
+    font-weight: bold;
+}
+
+.box .entity_id::before {
+    color: #444;
+    font-weight: normal;
+    content: 'ID: ';
+}
+
+.box.oracle_box .entity_id::before {
+    content: 'ID:    ';
+}
+
+.box .inline_button {
+    min-width: 80px;
+    text-align: center;
+    padding: 2px 5px;
+    border-radius: 3px;
+    color: #FFF;
+    display: inline-block;
+    font-size: 12px;
+    cursor: pointer;
+    margin: 5px 5px 5px 0;
+    transition: 0.1s background-color;
+}
+
+.box   .delete_button { background-color: #B00; }
+.box  .restart_button { background-color: #08F; }
+.box    .pause_button { background-color: #F80; }
+.box  .details_button { background-color: #0B0; }
+.box   .accept_button { background-color: #F08; }
+.box .assembly_button { background-color: #80F; }
+.box   .delete_button:hover { background-color: #800; }
+.box  .restart_button:hover { background-color: #06B; }
+.box    .pause_button:hover { background-color: #B60; }
+.box  .details_button:hover { background-color: #080; }
+.box   .accept_button:hover { background-color: #B06; }
+.box .assembly_button:hover { background-color: #60B; }
+
+#content_container {
+    padding: 50px 10px 100px 10px;
+    background-color: #F8F8F8;
+}
+
+#content {
+    margin: 0 auto 0 auto;
+    text-align: center;
+}
+
+#content .view_head {
+    margin: 30px 0 20px 0;
+}
+
+#content .view_head .view_name {
+    font-size: 30px;
+    display: inline-block;
+}
+
+#content #qubic_view,
+#content #oracle_view {
+    text-align: left;
+    display: inline-block;
+    vertical-align: top;
+    margin: 5px;
+}
+
+
+#content #qubic_view .scroll,
+#content #oracle_view .scroll {
+    min-height: 400px;
+}
+
+#content .create_button,
+#content .reload_button {
+    font-size: 18px;
+    border-radius: 20px;
+    padding: 2px 5px;
+    background-color: #0B8;
+    color: #FFF;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    transition: 0.2s background-color;
+    font-weight: bold;
+    text-align: center;
+    display: inline-block;
+    vertical-align: top;
+    margin: 4px -10px 0 15px;
+}
+
+#content .create_button:hover,
+#content .reload_button:hover {
+    background-color: #086;
+}
+
+#content .button {
+    width: 170px;
+    display: inline-block;
+    margin: 10px;
+    cursor: pointer;
+    transition: 0.1s background-color, 0.1s border-color;
+    color: #666;
+    font-weight: bold;
+    font-size: 14px;
+    text-align: center;
+    padding-top: 8px;
+    vertical-align: top;
+    background-color: #EEE;
+    border-bottom: 8px solid #DDD;
+    padding-bottom: -5px;
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.15);
+    border-radius: 20px;
+}
+
+#content .button:hover {
+    background-color: #F8F8F8;
+    border-color: #EEE;
+}
+
+/*
+#content .button.c1 { background-color: #06B; }
+#content .button.c2 { background-color: #B60; }
+#content .button.c3 { background-color: #B06; }
+#content .button.c4 { background-color: #088; }
+
+#content .button.c1:hover { background-color: #08F; }
+#content .button.c2:hover { background-color: #F80; }
+#content .button.c3:hover { background-color: #F08; }
+#content .button.c4:hover { background-color: #0AA; }
+*/
+
+details {
+    margin: 5px 0 15px 0;
+}
+
+summary {
+    font-size: 14px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+textarea,
+input {
+    width: 315px;
+    border-radius: 3px;
+    padding: 10px 15px;
+    font-family: "Cantarell", "Verdana", "Source Sans Pro", "Segoe UI Light", "Arial", "DejaVu Sans", "DejaVu Sans Light", "DejaVu Sans", sans-serif;
+    border: 1px solid #DDD;
+    display: block;
+    margin: 5px 0;
+    color: #222;
+    vertical-align: middle;
+    font-size: 12px;
+}
+
+.input_line input {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.input_line input:last-child {
+    margin-right: 0;
+}
+
+textarea {
+    min-width: 640px;
+    max-width: 640px;
+    min-height: 200px;
+    font-family: monospace;
+    margin-bottom: 10px;
+}
+
+input[type=checkbox] {
+    width: auto;
+    display: inline-block;
+    margin: 10px 10px 10px 0;
+}
+
+.checkbox_container label {
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+input.big {
+    max-width: 60vw;
+    width: 640px;
+}
+
+input[type=button] {
+    background-color: #6f0066;
+    color: #FFF;
+    border: none;
+    background-image: linear-gradient(to right, #be6300, #be00af);
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.1s background-image;
+}
+
+input[type=button]:hover {
+    background-image: linear-gradient(to right, #ff8c0f, #ff0feb);
+}
+
+summary:focus { 
+    outline: none;
+}
+
+input::-moz-focus-inner { 
+  border: 0; 
+}
+
+footer {
+    background-color: #222;
+    padding: 50px;
+    text-align: center;
+    font-size: 14px;
+    color: #BBB;
+}
+
+footer a {
+    color: #FFF;
+    text-decoration: none;
+}
+
+footer a:focus {
+    outline: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}

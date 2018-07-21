@@ -1,13 +1,19 @@
 package commands.oracle;
 
+import api.resp.general.ResponseAbstract;
+import api.resp.general.ResponseError;
+import api.resp.oracle.ResponseOracleCreate;
 import commands.Command;
 import commands.param.CallValidator;
 import commands.param.ParameterValidator;
 import commands.param.validators.TryteValidator;
+import exceptions.InvalidQubicTransactionException;
 import main.Persistence;
 import oracle.OracleManager;
 import oracle.OracleWriter;
 import qubic.QubicReader;
+
+import java.util.Map;
 
 public class CommandOracleCreate extends Command {
 
@@ -38,15 +44,26 @@ public class CommandOracleCreate extends Command {
     }
 
     @Override
-    public void perform(Persistence persistence, String[] par) {
-        println("creating oracle ...");
+    public void terminalPostPerformAction(ResponseAbstract response, Persistence persistence, String[] par) {
+        println("started oracle with id: '" + ((ResponseOracleCreate)response).getOracleID() + "'");
+    }
 
-        String qubicId = par[1];
-        OracleWriter ow = new OracleWriter(new QubicReader(qubicId));
+    @Override
+    public ResponseAbstract perform(Persistence persistence, Map<String, Object> parMap) {
+
+        String qubicID = (String)parMap.get("qubic_id");
+        QubicReader qr;
+        try {
+            qr = new QubicReader(qubicID);
+        } catch (InvalidQubicTransactionException e) {
+            return new ResponseError(e);
+        }
+
+        OracleWriter ow = new OracleWriter(qr);
         OracleManager om = new OracleManager(ow);
         persistence.addOracleWriter(ow);
         om.start();
 
-        println("started oracle with id: '" + ow.getID() + "'");
+        return new ResponseOracleCreate(ow.getID());
     }
 }

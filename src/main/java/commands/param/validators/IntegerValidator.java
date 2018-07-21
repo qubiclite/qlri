@@ -27,6 +27,11 @@ public class IntegerValidator extends ParameterValidator {
     }
 
     @Override
+    public Object convertParToObject(String par) {
+        return Integer.parseInt(par);
+    }
+
+    @Override
     public String toString() {
         return "INTEGER ["+min+","+max+"]";
     }

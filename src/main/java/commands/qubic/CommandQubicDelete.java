@@ -1,11 +1,16 @@
 package commands.qubic;
 
+import api.resp.general.ResponseAbstract;
+import api.resp.general.ResponseError;
+import api.resp.general.ResponseSuccess;
 import commands.Command;
 import commands.param.CallValidator;
 import commands.param.ParameterValidator;
 import commands.param.validators.TryteValidator;
 import main.Persistence;
 import qubic.QubicWriter;
+
+import java.util.Map;
 
 public class CommandQubicDelete extends Command {
 
@@ -36,14 +41,18 @@ public class CommandQubicDelete extends Command {
     }
 
     @Override
-    public void perform(Persistence persistence, String[] par) {
+    public void terminalPostPerformAction(ResponseAbstract response, Persistence persistence, String[] par) {
+        println("qubic deleted from persistence");
+    }
 
-        String handle = par[1];
-        QubicWriter qw = persistence.findQubicWriterByHandle(handle);
+    @Override
+    public ResponseAbstract perform(Persistence persistence, Map<String, Object> parMap) {
+        String qubicID = (String)parMap.get("qubic_handle");
+        QubicWriter qw = persistence.findQubicWriterByHandle(qubicID);
+        if(qw == null)
+            return new ResponseError("you do not own a qubic with the id '"+qubicID+"'");
 
-        if(qw != null) {
-            persistence.deleteQubicWriter(qw);
-            println("qubic '" + qw.getID() + "' deleted from persistence");
-        }
+        persistence.deleteQubicWriter(qw);
+        return new ResponseSuccess();
     }
 }

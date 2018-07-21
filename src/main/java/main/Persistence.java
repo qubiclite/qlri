@@ -1,5 +1,6 @@
 package main;
 
+import exceptions.CorruptIAMStreamException;
 import oracle.OracleManager;
 import oracle.OracleWriter;
 import org.json.JSONArray;
@@ -12,16 +13,18 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.StringJoiner;
 
 public class Persistence {
 
-    private final static String PERSISTENCE_FILE = "qlite.json";
+    private final String filePath;
 
     private HashMap<String, QubicWriter> qubicWriters = new HashMap();
     private HashMap<String, OracleWriter> oracleWriters = new HashMap();
     private HashMap<String, IAMPublisher> iamPublishers = new HashMap();
 
-    public Persistence() {
+    public Persistence(boolean testnet) {
+        filePath = "qlite"+(testnet ? "_testnet" : "_mainnet")+".json";
         load();
     }
 
@@ -169,12 +172,12 @@ public class Persistence {
     /**
      * Stores the current persistence state into the persistence file.
      * */
-    private void store() {
+    protected void store() {
         JSONObject persistenceObject = buildPersistenceObject();
         String persistenceString = persistenceObject.toString();
 
         try {
-            PrintWriter writer = new PrintWriter(PERSISTENCE_FILE, "UTF-8");
+            PrintWriter writer = new PrintWriter(filePath, "UTF-8");
             writer.println(persistenceString);
             writer.close();
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
@@ -210,6 +213,7 @@ public class Persistence {
             JSONObject owObj = new JSONObject();
 
             owObj.put("qubic", ow.getQubicReader().getID());
+            owObj.put("paused", !ow.getManager().isRunning());
             owObj.put("hash_stream_id", ow.getHashStreamID());
             owObj.put("hash_private_key", ow.getHashPrivateKeyTrytes());
             owObj.put("result_stream_id", ow.getResultStreamID());
@@ -240,27 +244,39 @@ public class Persistence {
         }
 
         JSONArray ipArr = persObj.getJSONArray("iam_streams");
-        Main.println("loading "+ipArr.length()+" iam streams ...");
+        Main.println("loading "+ipArr.length()+" iam stream(s) ...");
         for(int i = 0; i < ipArr.length(); i++) {
             JSONObject ipObj = ipArr.getJSONObject(i);
             String iamId = ipObj.getString("id");
             String privKeyTrytes = ipObj.getString("private_key");
-            IAMPublisher ip = new IAMPublisher(iamId, privKeyTrytes);
-            iamPublishers.put(ip.getID(), ip);
+
+            try {
+                IAMPublisher ip = new IAMPublisher(iamId, privKeyTrytes);
+                iamPublishers.put(ip.getID(), ip);
+            } catch (Throwable t) {
+                Main.err("failed loading iam stream " + iamId + ": " + t.getMessage() + " ("+t.getClass().getName()+")");
+                continue;
+            }
         }
 
         JSONArray qwArr = persObj.getJSONArray("qubic_writers");
-        Main.println("loading "+qwArr.length()+" qubics ...");
+        Main.println("loading "+qwArr.length()+" qubic(s) ...");
         for(int i = 0; i < qwArr.length(); i++) {
             JSONObject qwObj = qwArr.getJSONObject(i);
             String qubicId = qwObj.getString("id");
             String privKeyTrytes = qwObj.getString("private_key");
-            QubicWriter qw = new QubicWriter(qubicId, privKeyTrytes);
-            qubicWriters.put(qw.getID(), qw);
+
+            try {
+                QubicWriter qw = new QubicWriter(qubicId, privKeyTrytes);
+                qubicWriters.put(qw.getID(), qw);
+            } catch (Throwable t) {
+                Main.err("failed loading qubic " + qubicId + ": " + t.getMessage() + " ("+t.getClass().getName()+")");
+                continue;
+            }
         }
 
         JSONArray owArr = persObj.getJSONArray("oracle_writers");
-        Main.println("loading "+owArr.length()+" oracles ...");
+        Main.println("loading "+owArr.length()+" oracle(s) ...");
         for(int i = 0; i < owArr.length(); i++) {
             JSONObject owObj = owArr.getJSONObject(i);
 
@@ -269,12 +285,25 @@ public class Persistence {
             String hashPrivKey = owObj.getString("hash_private_key");
             String resStreamId = owObj.getString("result_stream_id");
             String resPrivKey = owObj.getString("result_private_key");
+            boolean paused = owObj.getBoolean("paused");
 
-            Main.println("starting oracle: '"+resStreamId+"' ...");
+            if(!paused)
+                Main.println("starting oracle: '"+resStreamId+"' ...");
 
-            OracleWriter ow = new OracleWriter(new QubicReader(qubicId), hashStreamId, hashPrivKey, resStreamId, resPrivKey);
-            addOracleWriter(ow);
-            new OracleManager(ow).start();
+            OracleWriter ow;
+
+            try {
+                ow = new OracleWriter(new QubicReader(qubicId), hashStreamId, hashPrivKey, resStreamId, resPrivKey);
+            } catch (Throwable t) {
+                Main.err("failed loading oracle " + resStreamId + ": " + t.getMessage() + " ("+t.getClass().getName()+")");
+                continue;
+            }
+
+            oracleWriters.put(ow.getID(), ow);
+            new OracleManager(ow);
+
+            if(!paused)
+                ow.getManager().start();
         }
 
         Main.println("persistence loaded");
@@ -286,7 +315,7 @@ public class Persistence {
      * */
     private JSONObject readPersistenceObject() {
 
-        String s = readFile(PERSISTENCE_FILE);
+        String s = readFile(filePath);
         return s == null ? null : new JSONObject(s);
     }
 
@@ -312,12 +341,12 @@ public class Persistence {
             return null;
         }
 
-        StringBuilder sb = new StringBuilder();
+        StringJoiner sj = new StringJoiner("\n");
         while(scanner.hasNext()) {
-            sb.append(scanner.nextLine());
+            sj.add(scanner.nextLine());
         }
         scanner.close();
 
-        return sb.toString();
+        return sj.toString();
     }
 }

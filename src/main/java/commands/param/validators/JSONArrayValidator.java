@@ -1,0 +1,28 @@
+package commands.param.validators;
+
+import commands.param.ParameterValidator;
+import org.json.JSONArray;
+import org.json.JSONException;
+
+public class JSONArrayValidator extends ParameterValidator {
+
+    @Override
+    public String validate(String par) {
+        try {
+            new JSONArray(par);
+            return null;
+        } catch (JSONException e) {
+            return "not a json array";
+        }
+    }
+
+    @Override
+    public Object convertParToObject(String par) {
+        return new JSONArray(par);
+    }
+
+    @Override
+    public String toString() {
+        return "JSON ARRAY";
+    }
+}
