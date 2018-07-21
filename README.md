@@ -5,7 +5,7 @@ Create qubics, run oracles, read quorum based results etc.
 
 ## Downloading the Precompiled Jar File (Simple Installation)
 
-Simply download the newest .jar file from the [releases](https://github.com/qubiclite/qlri/releases) and put it into your favorite folder/directory. After that you can already [start](#running-the-jar-file) it.
+Simply download the newest .zip file from the [releases](https://github.com/qubiclite/qlri/releases) and unzip its content it into your favorite folder/directory. After that you can already [start](#running-the-jar-file) it.
 
 ## Build from Source Code via Maven (Advanced Installation)
 
