@@ -86,7 +86,7 @@ public class API {
 
         String uri = exchange.getRequestURI();
 
-        if(uri.equals("/")) uri = "/index.html";
+        if(uri.endsWith("/")) uri += "index.html";
 
         String contentType = "plain";
 
@@ -112,6 +112,7 @@ public class API {
         MappedByteBuffer buffer = inChannel.map(FileChannel.MapMode.READ_ONLY, 0, inChannel.size());
         buffer.load();
         exchange.getResponseSender().send(buffer);
+        file.close();
     }
 
     private ResponseAbstract processRawRequest(String body, HttpServerExchange exchange) {

@@ -1,48 +1,3 @@
-const API_VERSION = "v0.2";
-const url = window.location.origin;
-const headers = {'X-QLITE-API-Version': API_VERSION};
-const error_callback = function(err) {
-	toastr.error("an error occured: check your ql-node terminal and your web browser console");
-	console.log("ERROR:");
-	console.log(err);
-};
-
-// credits to https://css-tricks.com/snippets/javascript/htmlentities-for-javascript/ (modified)
-function html_entities(str) {
-    return String(str).replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
-function send_ajax(request, success_callback, final_callback = null) {
-
-	console.log("curl -X POST "+url+" -H 'X-QLITE-API-Version: "+API_VERSION+"' -d '"+JSON.stringify(request)+"'");
-
-	var success_callback_wrapper = function(data) {
-		if(data['success']) {
-			success_callback(JSON.parse(html_entities(JSON.stringify(data))));
-			if(final_callback != null) final_callback();
-		} else {
-			if(final_callback != null) final_callback();
-			toastr.error(data['error']);
-		}
-	}
-
-	var error_callback_wrapper = function(err) {
-		error_callback(err);
-		final_callback();
-	}
-
-	$.ajax({
-	    type: 'POST', 
-		url: url,
-		headers: headers,
-		processData: true,
-	    data: JSON.stringify(request),
-	    dataType: 'json',
-	    success: success_callback_wrapper,
-	    error: error_callback
-	});
-}
-
 // TODO
 function block_form(form_identifier) {
 	$(form_identifier + " input[type=button]").addClass('hidden');
@@ -244,5 +199,62 @@ function unix_to_date(unix){
 	var h = a.getHours();
 	var m = a.getMinutes();
 	var s = a.getSeconds();
-	return y + '/' + mo + '/' + d + ' ' + h + ':' + m + ':' + s ;
+	return y + '/' + mo + '/' + (d<10?"0"+d:d) + ' ' + (h<10?"0"+h:h) + ':' + (m<10?"0"+m:m) + ':' + (s<10?"0"+s:s);
+}
+
+function install_app(app_id) {
+	$('#qapps').html("");
+	send_ajax({
+		'command': 'ai',
+		'url': $('#app_url').val(),
+	}, function(data) {
+		list_qapps();
+	}, function(data) {
+		list_qapps();
+	}); 
+}
+
+function uninstall_app(app_id) {
+	$('#qapps').html("");
+	send_ajax({
+		'command': 'au',
+		'app': app_id,
+	}, function(data) {
+		list_qapps();
+	}, function(data) {
+		list_qapps();
+	}); 
+}
+	
+function load_qapp(name) {
+	$('#page_qapp iframe').attr("src", "qapps/"+name+"/index.html");
+	$('nav').addClass("hidden");
+	$('footer').addClass("hidden");
+	$('#page_qapp_list').addClass("hidden");
+	$('#page_qapp').removeClass("hidden");
+}
+
+function list_qapps() {
+	send_ajax({
+		'command': 'al',
+	}, function(data) {
+		$('#qapps').html("");
+		data['list'].forEach(function(element) {
+			details = "";
+			var qapp = $("<div class='qapp'></div>");
+
+			qapp.append($("<img src='qapps/"+element['id']+"/imgs/thumbnail.png'>"));
+
+			var details = $("<div class='details'></div>");
+			details.append($("<div class='title'></div>").text(element['title']));
+			details.append($("<div class='description'></div>").text(element['description']));
+			details.append($("<a class='website' href='"+element['url']+"' target='_blank'></a>").text(element['url']));
+			details.append($("<div class='license'></div>").text(element['license']));
+			details.append('<a class="button" href="qapps/'+element['id']+'/" target="_blank"> start</a>');
+			details.append('<div class="button" onclick="uninstall_app(\''+element['id']+'\')">uninstall</div>');
+			qapp.append(details);
+
+			$('#qapps').append(qapp);
+		})
+	}); 
 }

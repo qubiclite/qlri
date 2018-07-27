@@ -1,5 +1,8 @@
 *.jar
 *.iml
+qlite_testnet.json
 qlite.json
 /.idea
 /target
+/qlweb/qapps/*
+pom.xml.versionsBackup

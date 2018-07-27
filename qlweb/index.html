@@ -5,6 +5,7 @@
 	<link rel="stylesheet" type="text/css" href="style.css">
 	<link rel="stylesheet" type="text/css" href="toastr/toastr.min.css">
 	<script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
+	<script type="text/javascript" src="js/ql.js"></script>
 	<script type="text/javascript" src="js/main.js"></script>
 	<script type="text/javascript" src="toastr/toastr.min.js"></script>
 	<link rel="shortcut icon" type="image/x-icon" href="imgs/favicon.ico">
@@ -15,11 +16,12 @@
 <nav>
 	<div id="logo"></div>
 	<ul>
-		<li id="selected">home</li>
-		<li><s>plugins</s></li>
-		<li><s>help</s></li>
+		<li onclick="$('#page_dashboard').removeClass('hidden');$('#page_qapp_list').addClass('hidden');">Dashboard</li>
+		<a onclick="$('#page_dashboard').addClass('hidden');$('#page_qapp_list').removeClass('hidden');"><li>qApps</li></a>
 	</ul>
 </nav>
+
+<div id='page_dashboard'>
 <header>
 	<div id="suptext">Qlite Web</div>
 	<div id="subtext">the web interface for your ql-node</div>
@@ -488,9 +490,32 @@
 			$('#window_qla').addClass('hidden');
 		});
 	});
-
-	set_in
 </script>
+</div>
+
+<!-- 8=================================3 -->
+
+<div id="page_qapp_list" class="hidden">
+
+<header>
+	<div id="suptext">your qApps</div>
+	<div id="subtext">experience the application layer of qubic lite</div>
+</header>
+
+<form id="install_app">
+	<div id="install_app_warning">do not install qApps from untrusted sources!</div>
+	<input type="url" placeholder="qapp url (e.g. http://qame.org/tanglefarm)" id="app_url">
+	<input type="button" value="install" onclick="install_app();">
+</form>
+<div id="qapps"></div>
+<script type="text/javascript">
+
+list_qapps();
+
+</script>
+</div>
+
+<!-- 8=================================3 -->
 
 <footer>
 	created by <a href="https://ecosystem.iota.org/users/microhash-7817/profile" target="_blank">microhash</a> for <a href="http://qubiclite.org" target="_blank">qubiclite.org</a>

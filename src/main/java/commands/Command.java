@@ -2,6 +2,9 @@ package commands;
 
 import api.resp.general.ResponseAbstract;
 import api.resp.general.ResponseError;
+import commands.app.CommandAppInstall;
+import commands.app.CommandAppList;
+import commands.app.CommandAppUninstall;
 import commands.iam.*;
 import commands.oracle.*;
 import commands.param.CallValidator;
@@ -43,6 +46,10 @@ public abstract class Command {
             CommandIAMList.instance,
             CommandIAMWrite.instance,
             CommandIAMRead.instance,
+
+            CommandAppList.instance,
+            CommandAppInstall.instance,
+            CommandAppUninstall.instance,
     };
 
     /**

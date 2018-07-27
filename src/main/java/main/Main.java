@@ -14,12 +14,14 @@ import java.util.StringJoiner;
 public class Main {
 
     public static final DateFormat DF = new SimpleDateFormat("YYYY/MMM/dd HH:mm:ss");
-    private static final String VERSION = "0.2";
+    private static final String VERSION = "0.3";
     private static final Scanner s = new Scanner(System.in);
 
     private static Persistence persistence;
 
     public static void main(String[] args) {
+
+        Command.printCommandTable();
 
         println("");
         println("=== Welcome to QLRI v"+VERSION+" ===");

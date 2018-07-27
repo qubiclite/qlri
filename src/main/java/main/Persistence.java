@@ -1,27 +1,26 @@
 package main;
 
-import exceptions.CorruptIAMStreamException;
 import oracle.OracleManager;
 import oracle.OracleWriter;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import qubic.QubicReader;
 import qubic.QubicWriter;
 import tangle.IAMPublisher;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Scanner;
-import java.util.StringJoiner;
+import java.util.*;
 
 public class Persistence {
 
+    public static final String APP_DIR_PATH = "qlweb/qapps";
     private final String filePath;
 
     private HashMap<String, QubicWriter> qubicWriters = new HashMap();
     private HashMap<String, OracleWriter> oracleWriters = new HashMap();
     private HashMap<String, IAMPublisher> iamPublishers = new HashMap();
+    private HashMap<String, App> apps = new HashMap();
 
     public Persistence(boolean testnet) {
         filePath = "qlite"+(testnet ? "_testnet" : "_mainnet")+".json";
@@ -306,7 +305,49 @@ public class Persistence {
                 ow.getManager().start();
         }
 
+        Main.println("loading app(s) ...");
+        loadApps();
+
         Main.println("persistence loaded");
+    }
+
+    public void loadApps() {
+
+        HashMap<String, App> newApps = new HashMap<>();
+
+        File appDir = new File(APP_DIR_PATH);
+        File[] children = appDir.listFiles();
+
+        if (children != null) {
+            for (File child : children) {
+                addApp(newApps, child.getName());
+            }
+        }
+
+        apps = newApps;
+    }
+
+    private void addApp(HashMap<String, App> appMap, String appDirName) {
+
+        String metaString = readFile(APP_DIR_PATH + "/" + appDirName + "/meta.json");
+        JSONObject meta;
+
+        try {
+            meta = new JSONObject(metaString);
+
+            String title       = meta.getString("title");
+            String description = meta.getString("description");
+            String version     = meta.getString("version");
+            String url         = meta.getString("url");
+            String license     = meta.getString("license");
+
+            App app = new App(appDirName, title, description, version, url, license);
+            appMap.put(appDirName, app);
+
+        } catch (JSONException e) {
+            Main.err("failed loading app '"+appDirName+"': invalid meta file");
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -348,5 +389,9 @@ public class Persistence {
         scanner.close();
 
         return sj.toString();
+    }
+
+    public Collection<App> getApps() {
+        return apps.values();
     }
 }
