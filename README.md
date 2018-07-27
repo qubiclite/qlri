@@ -149,12 +149,18 @@ For specific information to a command (parameter details + example use), use `he
 | `iam_list`                | `il`  | prints the full list of all IAM streams stored in the persistence
 | `iam_write`               | `iw`  | writes a message into the iam stream to a certain index
 | `iam_read`                | `ir`  | reads the message of an IAM stream at a certain index
+| | |
+| `apps_list`               | `al`  | prints the full list of all app installed
+| `app_install`             | `ai`  | installs an app from an external source
+| `app_uninstall`           | `au`  | uninstalls an app
 
 ## Screenshots
 
-<img src="http://qubiclite.org/imgs/screenshots/qlite_web_0.png" alt="ql web, gui for your browser" />
-<img src="http://qubiclite.org/imgs/screenshots/qlri_terminal.png" alt="running the qlri from terminal" />
+<img src="http://qubiclite.org/imgs/screenshots/qlite_web_0.png" alt="Qlite Web, gui for your browser" />
+<img src="http://qubiclite.org/imgs/screenshots/qlite_web_1.png" alt="Qlite Web supports qApps" />
+<img src="http://qubiclite.org/imgs/screenshots/qlri_terminal.png" alt="running the QLRI from terminal" />
 
 ## Project Resources
 
-official project website: http://qubiclite.org
+* official project website: http://qubiclite.org
+* qApp catalog: http://qame.org

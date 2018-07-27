@@ -21,8 +21,6 @@ public class Main {
 
     public static void main(String[] args) {
 
-        Command.printCommandTable();
-
         println("");
         println("=== Welcome to QLRI v"+VERSION+" ===");
         println("");
