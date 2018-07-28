@@ -53,6 +53,7 @@ public class CommandOracleDelete extends Command {
         if(ow == null)
             return new ResponseError("you do not own a oracle with the id '"+oracleID+"'");
 
+        ow.getManager().terminate();
         persistence.deleteOracleWriter(ow);
         return new ResponseSuccess();
     }
