@@ -1,5 +1,6 @@
 package main;
 
+import iam.IAMWriter;
 import oracle.OracleManager;
 import oracle.OracleWriter;
 import org.json.JSONArray;
@@ -7,7 +8,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import qubic.QubicReader;
 import qubic.QubicWriter;
-import tangle.IAMPublisher;
 
 import java.io.*;
 import java.util.*;
@@ -15,15 +15,16 @@ import java.util.*;
 public class Persistence {
 
     public static final String APP_DIR_PATH = "qlweb/qapps";
-    private final String filePath;
+    private static final String PERSISTENCE_DIR_PATH = "persistence";
+    private final String persistenceFileName;
 
-    private HashMap<String, QubicWriter> qubicWriters = new HashMap();
-    private HashMap<String, OracleWriter> oracleWriters = new HashMap();
-    private HashMap<String, IAMPublisher> iamPublishers = new HashMap();
-    private HashMap<String, App> apps = new HashMap();
+    private HashMap<String, QubicWriter> qubicWriters = new HashMap<>();
+    private HashMap<String, OracleWriter> oracleWriters = new HashMap<>();
+    private HashMap<String, IAMWriter> iamPublishers = new HashMap<>();
+    private HashMap<String, App> apps = new HashMap<>();
 
     public Persistence(boolean testnet) {
-        filePath = "qlite"+(testnet ? "_testnet" : "_mainnet")+".json";
+        persistenceFileName = (testnet ? "tn_" : "mn_")+Main.VERSION+".json";
         load();
     }
 
@@ -37,7 +38,7 @@ public class Persistence {
         store();
     }
 
-    public void addIAMPublisher(IAMPublisher ip) {
+    public void addIAMPublisher(IAMWriter ip) {
         iamPublishers.put(ip.getID(), ip);
         store();
     }
@@ -52,7 +53,7 @@ public class Persistence {
         store();
     }
 
-    public void deleteIAMPublisher(IAMPublisher ip) {
+    public void deleteIAMPublisher(IAMWriter ip) {
         iamPublishers.remove(ip.getID());
         store();
     }
@@ -62,10 +63,12 @@ public class Persistence {
      * @param handle the tryte sequence the IAM IDs starts with
      * @return the IAM streams found, NULL if multiple or none found
      * */
-    public ArrayList<IAMPublisher> findAllIAMStreamsWithHandle(String handle) {
+    public List<IAMWriter> findAllIAMStreamsWithHandle(String handle) {
+        if(handle == null) handle = "";
 
-        ArrayList<IAMPublisher> candidates = new ArrayList<>();
-        for(IAMPublisher ip : iamPublishers.values()) {
+        List<IAMWriter> candidates = new LinkedList<>();
+
+        for(IAMWriter ip : iamPublishers.values()) {
             if(ip.getID().startsWith(handle))
                 candidates.add(ip);
         }
@@ -77,9 +80,10 @@ public class Persistence {
      * @param handle the tryte sequence the oracle IDs starts with
      * @return the oracles found, NULL if multiple or none found
      * */
-    public ArrayList<OracleWriter> findAllOracleWritersWithHandle(String handle) {
+    public List<OracleWriter> findAllOracleWritersWithHandle(String handle) {
+        if(handle == null) handle = "";
 
-        ArrayList<OracleWriter> candidates = new ArrayList<>();
+        List<OracleWriter> candidates = new LinkedList<>();
         for(OracleWriter ow : oracleWriters.values()) {
             if(ow.getID().startsWith(handle))
                 candidates.add(ow);
@@ -92,9 +96,10 @@ public class Persistence {
      * @param handle the tryte sequence the qubic IDs starts with
      * @return the qubics found, NULL if multiple or none found
      * */
-    public ArrayList<QubicWriter> findAllQubicWritersWithHandle(String handle) {
+    public List<QubicWriter> findAllQubicWritersWithHandle(String handle) {
+        if(handle == null) handle = "";
 
-        ArrayList<QubicWriter> candidates = new ArrayList<>();
+        List<QubicWriter> candidates = new LinkedList<>();
         for(QubicWriter qw : qubicWriters.values()) {
             if(qw.getID().startsWith(handle))
                 candidates.add(qw);
@@ -107,13 +112,13 @@ public class Persistence {
      * @param handle the tryte sequence the IAM ID starts with
      * @return the IAM stream found, NULL if multiple or none found
      * */
-    public IAMPublisher findIAMStreamByHandle(String handle) {
+    public IAMWriter findIAMStreamByHandle(String handle) {
 
-        ArrayList<IAMPublisher> ips = findAllIAMStreamsWithHandle(handle);
+        List<IAMWriter> ips = findAllIAMStreamsWithHandle(handle);
 
         if(ips.size() > 1) {
             Main.println("found " + ips.size() + " IAM streams, which one did you mean?");
-            for(IAMPublisher ip : ips)
+            for(IAMWriter ip : ips)
                 Main.println("   > " + ip.getID());
             return null;
         } else if(ips.size() == 0) {
@@ -131,7 +136,7 @@ public class Persistence {
      * */
     public OracleWriter findOracleWriterByHandle(String handle) {
 
-        ArrayList<OracleWriter> ows = findAllOracleWritersWithHandle(handle);
+        List<OracleWriter> ows = findAllOracleWritersWithHandle(handle);
 
         if(ows.size() > 1) {
             Main.println("found " + ows.size() + " oracles, which one did you mean?");
@@ -153,7 +158,7 @@ public class Persistence {
      * */
     public QubicWriter findQubicWriterByHandle(String handle) {
 
-        ArrayList<QubicWriter> qws = findAllQubicWritersWithHandle(handle);
+        List<QubicWriter> qws = findAllQubicWritersWithHandle(handle);
 
         if(qws.size() > 1) {
             Main.println("found " + qws.size() + " qubics, which one did you mean?");
@@ -171,17 +176,19 @@ public class Persistence {
     /**
      * Stores the current persistence state into the persistence file.
      * */
-    protected void store() {
+    void store() {
         JSONObject persistenceObject = buildPersistenceObject();
         String persistenceString = persistenceObject.toString();
 
+        File dir = new File(PERSISTENCE_DIR_PATH);
+        if(!dir.exists()) dir.mkdir();
+
         try {
-            PrintWriter writer = new PrintWriter(filePath, "UTF-8");
+            PrintWriter writer = new PrintWriter(PERSISTENCE_DIR_PATH + "/" + persistenceFileName, "UTF-8");
             writer.println(persistenceString);
             writer.close();
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
             e.printStackTrace();
-            return;
         }
     }
 
@@ -192,7 +199,7 @@ public class Persistence {
     private JSONObject buildPersistenceObject() {
 
         JSONArray ipArr = new JSONArray();
-        for(IAMPublisher ip : iamPublishers.values()) {
+        for(IAMWriter ip : iamPublishers.values()) {
             JSONObject ipObj = new JSONObject();
             ipObj.put("id", ip.getID());
             ipObj.put("private_key", ip.getPrivateKeyTrytes());
@@ -203,7 +210,7 @@ public class Persistence {
         for(QubicWriter qw : qubicWriters.values()) {
             JSONObject qwObj = new JSONObject();
             qwObj.put("id", qw.getID());
-            qwObj.put("private_key", qw.getPrivateKeyTrytes());
+            qwObj.put("private_key", qw.getWriter().getPrivateKeyTrytes());
             qwArr.put(qwObj);
         }
 
@@ -213,10 +220,8 @@ public class Persistence {
 
             owObj.put("qubic", ow.getQubicReader().getID());
             owObj.put("paused", !ow.getManager().isRunning());
-            owObj.put("hash_stream_id", ow.getHashStreamID());
-            owObj.put("hash_private_key", ow.getHashPrivateKeyTrytes());
-            owObj.put("result_stream_id", ow.getResultStreamID());
-            owObj.put("result_private_key", ow.getResultPrivateKeyTrytes());
+            owObj.put("id", ow.getID());
+            owObj.put("private_key", ow.getIAMWriter().getPrivateKeyTrytes());
 
             owArr.put(owObj);
         }
@@ -247,14 +252,13 @@ public class Persistence {
         for(int i = 0; i < ipArr.length(); i++) {
             JSONObject ipObj = ipArr.getJSONObject(i);
             String iamId = ipObj.getString("id");
-            String privKeyTrytes = ipObj.getString("private_key");
+            String privateKeyTrytes = ipObj.getString("private_key");
 
             try {
-                IAMPublisher ip = new IAMPublisher(iamId, privKeyTrytes);
-                iamPublishers.put(ip.getID(), ip);
+                IAMWriter iw = new IAMWriter(iamId, privateKeyTrytes);
+                iamPublishers.put(iw.getID(), iw);
             } catch (Throwable t) {
                 Main.err("failed loading iam stream " + iamId + ": " + t.getMessage() + " ("+t.getClass().getName()+")");
-                continue;
             }
         }
 
@@ -263,14 +267,14 @@ public class Persistence {
         for(int i = 0; i < qwArr.length(); i++) {
             JSONObject qwObj = qwArr.getJSONObject(i);
             String qubicId = qwObj.getString("id");
-            String privKeyTrytes = qwObj.getString("private_key");
+            String privateKeyTrytes = qwObj.getString("private_key");
 
             try {
-                QubicWriter qw = new QubicWriter(qubicId, privKeyTrytes);
+                IAMWriter iw = new IAMWriter(qubicId, privateKeyTrytes);
+                QubicWriter qw = new QubicWriter(iw);
                 qubicWriters.put(qw.getID(), qw);
             } catch (Throwable t) {
                 Main.err("failed loading qubic " + qubicId + ": " + t.getMessage() + " ("+t.getClass().getName()+")");
-                continue;
             }
         }
 
@@ -279,22 +283,20 @@ public class Persistence {
         for(int i = 0; i < owArr.length(); i++) {
             JSONObject owObj = owArr.getJSONObject(i);
 
-            String qubicId = owObj.getString("qubic");
-            String hashStreamId = owObj.getString("hash_stream_id");
-            String hashPrivKey = owObj.getString("hash_private_key");
-            String resStreamId = owObj.getString("result_stream_id");
-            String resPrivKey = owObj.getString("result_private_key");
+            String qubicID = owObj.getString("qubic");
+            String oracleID = owObj.getString("id");
+            String privateKeyTrytes = owObj.getString("private_key");
             boolean paused = owObj.getBoolean("paused");
 
             if(!paused)
-                Main.println("starting oracle: '"+resStreamId+"' ...");
+                Main.println("starting oracle: '"+oracleID+"' ...");
 
             OracleWriter ow;
 
             try {
-                ow = new OracleWriter(new QubicReader(qubicId), hashStreamId, hashPrivKey, resStreamId, resPrivKey);
+                ow = new OracleWriter(new QubicReader(qubicID), new IAMWriter(oracleID, privateKeyTrytes));
             } catch (Throwable t) {
-                Main.err("failed loading oracle " + resStreamId + ": " + t.getMessage() + " ("+t.getClass().getName()+")");
+                Main.err("failed loading oracle " + oracleID + ": " + t.getMessage() + " ("+t.getClass().getName()+")");
                 continue;
             }
 
@@ -355,8 +357,7 @@ public class Persistence {
      * @return JSON object containing the persistent data.
      * */
     private JSONObject readPersistenceObject() {
-
-        String s = readFile(filePath);
+        String s = readFile(PERSISTENCE_DIR_PATH + "/" + persistenceFileName);
         return s == null ? null : new JSONObject(s);
     }
 

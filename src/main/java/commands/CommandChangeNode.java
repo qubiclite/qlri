@@ -18,8 +18,8 @@ public class CommandChangeNode extends Command {
     public static final CommandChangeNode instance = new CommandChangeNode();
 
     private static final CallValidator CV = new CallValidator(new ParameterValidator[]{
-        new NodeAddressValidator().setName("node address").setExampleValue("https://node.example.org:14265").setDescription("address to any node api (mainnet or testnet, depending on what ql-nodes you want to connect to)"),
-        new IntegerValidator(9, 14).setName("min weight magnitude").setExampleValue("14").setDescription("always use 14, use 9 only when connecting to a testnet node").makeOptional(14),
+        new NodeAddressValidator().setName("node address").setExampleValue("https://node.example.org:14265").setDescription("address of any IOTA full node api (mainnet or testnet, depending on which ql-nodes you want to be able to interact with)"),
+        new IntegerValidator(9, 14).setName("mwm").setExampleValue("14").setDescription("min weight magnitude: use 9 when connecting to a testnet node, otherwise use 14").makeOptional(14),
     });
 
     @Override
@@ -39,7 +39,7 @@ public class CommandChangeNode extends Command {
 
     @Override
     public String getDescription() {
-        return "changes the node used to connect to and interact with the tangle";
+        return "Changes the IOTA full node used to interact with the tangle.";
     }
 
     @Override

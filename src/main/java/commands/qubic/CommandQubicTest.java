@@ -2,6 +2,7 @@ package commands.qubic;
 
 import api.resp.general.ResponseAbstract;
 import api.resp.general.ResponseError;
+import api.resp.general.ResponseSuccess;
 import api.resp.qubic.ResponseQubicTest;
 import commands.Command;
 import commands.param.CallValidator;
@@ -14,18 +15,18 @@ import qlvm.QLVM;
 
 import java.util.Map;
 
-public class CommandQubicTest extends Command {
+public class CommandQubicTest extends CommandQubicAbstract {
 
     public static final CommandQubicTest instance = new CommandQubicTest();
 
     private static final CallValidator CV = new CallValidator(new ParameterValidator[]{
-            new StringValidator().setName("code"),
-            new IntegerValidator(0, Integer.MAX_VALUE).setName("epoch index").makeOptional(1)
+            new StringValidator().setName("code").setDescription("qubic code you want to test").setExampleValue("return(epoch^2)"),
+            new IntegerValidator(0, Integer.MAX_VALUE).setName("epoch index").setExampleValue("3").setDescription("initializes the run time variable 'epoch' to simulate a running qubic").makeOptional(0)
     });
 
     private static final CallValidator CV_TERMINAL = new CallValidator(new ParameterValidator[]{
         new FilePathValidator().setName("code path").setExampleValue("../my_qubic.ql").setDescription("file containing the qubic code you want to test (absolute path or path relative to .jar file)"),
-        new IntegerValidator(0, Integer.MAX_VALUE).setName("epoch index").setExampleValue("3").setDescription("initializes the run time variable 'epoch' to simulate a running qubic").makeOptional(1)
+        new IntegerValidator(0, Integer.MAX_VALUE).setName("epoch index").setExampleValue("3").setDescription("initializes the run time variable 'epoch' to simulate a running qubic").makeOptional(0)
     });
 
     @Override
@@ -50,7 +51,7 @@ public class CommandQubicTest extends Command {
 
     @Override
     public String getDescription() {
-        return "runs ql code locally (instead of over the tangle) to allow the author to quickly test whether it works as intended";
+        return "Runs QL code locally (instead of over the tangle) to allow the author to quickly test whether it works as intended. Limited Functionality (e.g. no qubic_fetch).";
     }
 
     @Override
@@ -79,5 +80,10 @@ public class CommandQubicTest extends Command {
         long runtime = System.currentTimeMillis()-start;
 
         return new ResponseQubicTest(result, runtime);
+    }
+
+    @Override
+    public ResponseSuccess getSuccessResponseExample() {
+        return new ResponseQubicTest("9", 12);
     }
 }

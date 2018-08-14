@@ -2,6 +2,7 @@ package commands;
 
 import api.resp.ResponseFetchEpoch;
 import api.resp.general.ResponseAbstract;
+import api.resp.general.ResponseSuccess;
 import commands.param.CallValidator;
 import commands.param.ParameterValidator;
 import commands.param.validators.IntegerValidator;
@@ -12,6 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import qlvm.InterQubicResultFetcher;
 import qubic.QubicReader;
+import tangle.TryteTool;
 
 import java.util.Map;
 
@@ -19,11 +21,11 @@ public class CommandFetchEpoch extends Command {
 
     public static final CommandFetchEpoch instance = new CommandFetchEpoch();
 
-    private static final CallValidator CV = new CallValidator(new ParameterValidator[]{
-            new TryteValidator(81, 81).setName("qubic id").setExampleValue("KSU9E…SZ999").setDescription("IAM stream identity of the qubic to fetch from"),
-            new IntegerValidator(0, Integer.MAX_VALUE).setName("epoch index").setExampleValue("4").setDescription("epoch to fetch"),
-            new IntegerValidator(0, Integer.MAX_VALUE).setName("epoch index max").setExampleValue("7").setDescription("will fetch all epochs from 'epoch index' to 'epoch index max' if this parameter is set").makeOptional(-1)
-    });
+    private static ParameterValidator PV_QUBIC = new TryteValidator(81, 81).setName("qubic").setExampleValue(TryteTool.generateRandom(81)).setDescription("qubic to fetch from"),
+            PV_EPOCH = new IntegerValidator(0, Integer.MAX_VALUE).setName("epoch").setExampleValue("4").setDescription("epoch to fetch"),
+            PV_EPOCH_MAX = new IntegerValidator(0, Integer.MAX_VALUE).setName("epoch max").setExampleValue("7").setDescription("if used will fetch all epochs from '"+PV_EPOCH.getName()+"' up to this value").makeOptional(-1);
+
+    private static final CallValidator CV = new CallValidator(new ParameterValidator[]{ PV_QUBIC, PV_EPOCH, PV_EPOCH_MAX });
 
     @Override
     public CallValidator getCallValidator() {
@@ -42,7 +44,7 @@ public class CommandFetchEpoch extends Command {
 
     @Override
     public String getDescription() {
-        return "determines the quorum based result (which can be considered the consensus) of any qubic at any epoch";
+        return "Determines the quorum based result (consensus) of a qubic's epoch.";
     }
 
     @Override
@@ -68,15 +70,14 @@ public class CommandFetchEpoch extends Command {
 
     @Override
     public ResponseAbstract perform(Persistence persistence, Map<String, Object> parMap) {
-        String qubicId = (String)parMap.get("qubic_id");
-        int epoch_min = (int)parMap.get("epoch_index");
-        int epoch_max = (int)parMap.get("epoch_index_max");
+        String qubicId = (String)parMap.get(PV_QUBIC.getJSONKey());
+        int epoch_min = (int)parMap.get(PV_EPOCH.getJSONKey());
+        int epoch_max = (int)parMap.get(PV_EPOCH_MAX.getJSONKey());
         QubicReader qr = new QubicReader(qubicId);
         int lastCompletedEpoch = qr.lastCompletedEpoch();
 
-        if(epoch_max > lastCompletedEpoch) {
-            epoch_max = lastCompletedEpoch;
-        }
+        epoch_max = Math.max(epoch_min, epoch_max);
+        epoch_max = Math.min(epoch_max, lastCompletedEpoch);
 
         JSONArray arr = new JSONArray();
 
@@ -87,9 +88,25 @@ public class CommandFetchEpoch extends Command {
             fetchedEpoch.put("quorum", qbr.getQuorum());
             fetchedEpoch.put("quorum_max", qbr.getQuorumMax());
             fetchedEpoch.put("result", qbr.getResult());
-            arr.put(epoch-epoch_min, fetchedEpoch);
+            arr.put(fetchedEpoch);
         }
 
         return new ResponseFetchEpoch(arr, lastCompletedEpoch);
+    }
+
+    @Override
+    public ResponseSuccess getSuccessResponseExample() {
+        JSONArray arr = new JSONArray();
+
+        for(int epoch = 7; epoch <= 9; epoch++) {
+            JSONObject fetchedEpoch = new JSONObject();
+            fetchedEpoch.put("epoch", epoch);
+            fetchedEpoch.put("quorum", epoch == 8 ? 1 : 2);
+            fetchedEpoch.put("quorum_max", 3);
+            fetchedEpoch.put("result", epoch == 8 ? null : "" + epoch * epoch);
+            arr.put(fetchedEpoch);
+        }
+
+        return new ResponseFetchEpoch(arr, 815);
     }
 }

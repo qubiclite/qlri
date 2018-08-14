@@ -2,6 +2,7 @@ package commands.qubic;
 
 import api.resp.general.ResponseAbstract;
 import api.resp.general.ResponseError;
+import api.resp.general.ResponseSuccess;
 import api.resp.qubic.ResponseQubicRead;
 import commands.Command;
 import commands.param.CallValidator;
@@ -12,15 +13,17 @@ import main.Main;
 import main.Persistence;
 import org.json.JSONArray;
 import qubic.QubicReader;
+import qubic.QubicWriter;
+import tangle.TryteTool;
 
 import java.util.Map;
 
-public class CommandQubicRead extends Command {
+public class CommandQubicRead extends CommandQubicAbstract {
 
     public static final CommandQubicRead instance = new CommandQubicRead();
 
     private static final CallValidator CV = new CallValidator(new ParameterValidator[]{
-            new TryteValidator(81, 81).setName("qubic id").setExampleValue("KSU9E…SZ999").setDescription("IAM stream identity of the qubic to read"),
+            new TryteValidator(81, 81).setName("qubic").setDescription("id of the qubic to read"),
     });
 
     @Override
@@ -40,7 +43,7 @@ public class CommandQubicRead extends Command {
 
     @Override
     public String getDescription() {
-        return "reads the metadata of any qubic, thus allows the user to analyze that qubic";
+        return "Reads the specification of any qubic, thus allows the user to analyze that qubic.";
     }
 
     @Override
@@ -77,13 +80,32 @@ public class CommandQubicRead extends Command {
 
     @Override
     public ResponseAbstract perform(Persistence persistence, Map<String, Object> parMap) {
-        String qubicID = (String)parMap.get("qubic_id");
+        String qubicID = (String)parMap.get("qubic");
         try {
             QubicReader qr = new QubicReader(qubicID);
             return new ResponseQubicRead(qr);
         } catch (InvalidQubicTransactionException e) {
             return new ResponseError(e);
         }
+    }
+
+    @Override
+    public ResponseSuccess getSuccessResponseExample() {
+
+        QubicReader qr;
+
+        try {
+            qr = new QubicReader("GAPGBVIBDKTGZ9BVLCZYWPZAFMIXBDLCUTXOC9NEJ9HGDKZYGRPQVIHMZXRXCDLZIFXGECZBFSTTNA999");
+        } catch (Exception e) {
+            QubicWriter writer = new QubicWriter();
+            writer.getEditable().setCode("return(epoch^2);");
+            writer.publishQubicTransaction();
+            writer.getAssembly().add(TryteTool.generateRandom(81));
+            writer.publishAssemblyTransaction();
+            qr = new QubicReader(writer.getID());
+        }
+
+        return new ResponseQubicRead(qr);
     }
 
     private int lastCompletedEpoch(long executionStart, long epochDuration) {

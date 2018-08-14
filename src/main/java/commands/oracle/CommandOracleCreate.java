@@ -2,6 +2,7 @@ package commands.oracle;
 
 import api.resp.general.ResponseAbstract;
 import api.resp.general.ResponseError;
+import api.resp.general.ResponseSuccess;
 import api.resp.oracle.ResponseOracleCreate;
 import commands.Command;
 import commands.param.CallValidator;
@@ -12,15 +13,16 @@ import main.Persistence;
 import oracle.OracleManager;
 import oracle.OracleWriter;
 import qubic.QubicReader;
+import tangle.TryteTool;
 
 import java.util.Map;
 
-public class CommandOracleCreate extends Command {
+public class CommandOracleCreate extends CommandOracleAbstract {
 
     public static final CommandOracleCreate instance = new CommandOracleCreate();
 
     private static final CallValidator CV = new CallValidator(new ParameterValidator[]{
-        new TryteValidator(81, 81).setName("qubic id").setExampleValue("KSU9E…SZ999").setDescription("IAM stream identity of the qubic you want your oracle to process"),
+        new TryteValidator(81, 81).setName("qubic").setDescription("ID of the qubic which shall be processed by this oracle."),
     });
 
     @Override
@@ -40,7 +42,7 @@ public class CommandOracleCreate extends Command {
 
     @Override
     public String getDescription() {
-        return "creates a new oracle and stores it in the persistence. life cycle will be automized, no need to do anything from here on";
+        return "Creates a new oracle and stores it in the persistence. Life cycle will run automically, no more actions required from here on.";
     }
 
     @Override
@@ -51,7 +53,7 @@ public class CommandOracleCreate extends Command {
     @Override
     public ResponseAbstract perform(Persistence persistence, Map<String, Object> parMap) {
 
-        String qubicID = (String)parMap.get("qubic_id");
+        String qubicID = (String)parMap.get("qubic");
         QubicReader qr;
         try {
             qr = new QubicReader(qubicID);
@@ -65,5 +67,10 @@ public class CommandOracleCreate extends Command {
         om.start();
 
         return new ResponseOracleCreate(ow.getID());
+    }
+
+    @Override
+    public ResponseSuccess getSuccessResponseExample() {
+        return new ResponseOracleCreate(TryteTool.generateRandom(81));
     }
 }

@@ -19,12 +19,12 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Map;
 
-public class CommandAppInstall extends Command {
+public class CommandAppInstall extends ComandAppAbstract {
 
     public static final CommandAppInstall instance = new CommandAppInstall();
 
     private static final CallValidator CV = new CallValidator(new ParameterValidator[]{
-        new URLValidator().setName("url").setDescription("the url from where the app can be installed").setExampleValue("http://qame.org/tanglefarm")
+        new URLValidator().setName("url").setDescription("download source of the app").setExampleValue("http://qame.org/tanglefarm")
     });
 
     @Override
@@ -44,7 +44,7 @@ public class CommandAppInstall extends Command {
 
     @Override
     public String getDescription() {
-        return "installs an app from an external source";
+        return "Installs an app from an external source.";
     }
 
     @Override

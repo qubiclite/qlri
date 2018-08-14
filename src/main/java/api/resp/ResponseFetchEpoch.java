@@ -1,9 +1,9 @@
 package api.resp;
 
-import api.resp.general.ResponseAbstract;
+import api.resp.general.ResponseSuccess;
 import org.json.JSONArray;
 
-public class ResponseFetchEpoch extends ResponseAbstract {
+public class ResponseFetchEpoch extends ResponseSuccess {
 
     public ResponseFetchEpoch(JSONArray fetchedEpochs, int lastCompletedEpoch) {
         obj.put("fetched_epochs", fetchedEpochs);

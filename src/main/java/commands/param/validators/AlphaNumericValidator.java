@@ -21,6 +21,11 @@ public class AlphaNumericValidator extends ParameterValidator {
 
     @Override
     public String toString() {
-        return "ALPHANUMERIC STRING";
+        return "Alphanumeric";
+    }
+
+    @Override
+    public String genJSValidation() {
+        return "_ParameterValidator.validate_alphanumeric("+getJSONKey()+", '"+getJSONKey()+"');";
     }
 }

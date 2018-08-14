@@ -12,12 +12,12 @@ import qubic.QubicWriter;
 
 import java.util.Map;
 
-public class CommandQubicDelete extends Command {
+public class CommandQubicDelete extends CommandQubicAbstract {
 
     public static final CommandQubicDelete instance = new CommandQubicDelete();
 
     private static final CallValidator CV = new CallValidator(new ParameterValidator[]{
-        new TryteValidator(1, 81).setName("qubic handle").setExampleValue("G9").setDescription("deletes the qubic that starts with this tryte sequence"),
+        new TryteValidator(1, 81).setName("qubic handle").setDescription("deletes the qubic that starts with this tryte sequence"),
     });
 
     @Override
@@ -37,7 +37,7 @@ public class CommandQubicDelete extends Command {
 
     @Override
     public String getDescription() {
-        return "removes a qubic from the persistence (qubic's private key will be deleted: cannot be undone)";
+        return "Removes a qubic from the persistence (private key will be deleted: cannot be undone).";
     }
 
     @Override

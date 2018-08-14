@@ -1,20 +1,20 @@
 package main;
 
+import api.API;
 import api.resp.general.ResponseAbstract;
 import api.resp.general.ResponseError;
 import commands.Command;
-import tangle.TangleAPI;
 
+import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.StringJoiner;
 
 public class Main {
 
     public static final DateFormat DF = new SimpleDateFormat("YYYY/MMM/dd HH:mm:ss");
-    private static final String VERSION = "0.3";
+    public static final String VERSION = "0.4.0-SNAPSHOT";
     private static final Scanner s = new Scanner(System.in);
 
     private static Persistence persistence;
@@ -25,17 +25,22 @@ public class Main {
         println("=== Welcome to QLRI v"+VERSION+" ===");
         println("");
 
+        // initialize
         Configs cfg = Configs.getInstance();
-
         cfg.processArguments(args);
         persistence = new Persistence(cfg.isTestnet());
         if(cfg.isApiEnabled())
-            new api.API(persistence, cfg.getHost(), cfg.getPort());
+            try {
+                new API(persistence, cfg.getHost(), cfg.getPort());
+            } catch (UnknownHostException e) {
+                err("failed setting up API (unknown host: '"+cfg.getHost()+"')");
+            }
 
         println("");
-        println("Type 'help' for more information.");
+        println("type 'help' for more information");
         println("");
 
+        // set shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
                 println("terminating ...");
@@ -43,6 +48,7 @@ public class Main {
             }
         });
 
+        // react to user
         while(true) {
             String input = nextLine();
             String[] par = input.split(" ");

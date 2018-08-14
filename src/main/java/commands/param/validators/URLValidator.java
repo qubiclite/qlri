@@ -31,4 +31,9 @@ public class URLValidator extends ParameterValidator {
     public String toString() {
         return "URL";
     }
+
+    @Override
+    public String genJSValidation() {
+        return "_ParameterValidator.validate_string("+getJSONKey()+", '"+getJSONKey()+"');";
+    }
 }

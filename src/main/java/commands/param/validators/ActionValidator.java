@@ -18,6 +18,11 @@ public class ActionValidator extends ParameterValidator {
 
     @Override
     public String toString() {
-        return "COMMAND";
+        return "Command";
+    }
+
+    @Override
+    public String genJSValidation() {
+        return "_ParameterValidator.validate_string("+getJSONKey()+", '"+getJSONKey()+"');";
     }
 }

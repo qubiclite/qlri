@@ -2,6 +2,7 @@ package commands.qubic;
 
 import api.resp.general.ResponseAbstract;
 import api.resp.general.ResponseError;
+import api.resp.general.ResponseSuccess;
 import api.resp.qubic.ResponseQubicCreate;
 import commands.Command;
 import commands.param.CallValidator;
@@ -10,28 +11,28 @@ import commands.param.validators.FilePathValidator;
 import commands.param.validators.IntegerValidator;
 import commands.param.validators.StringValidator;
 import main.Persistence;
+import qubic.EditableQubicSpecification;
 import qubic.QubicWriter;
+import tangle.TryteTool;
 
 import java.util.Map;
 
-public class CommandQubicCreate extends Command {
+public class CommandQubicCreate extends CommandQubicAbstract {
 
     public static final CommandQubicCreate instance = new CommandQubicCreate();
 
+    private static final ParameterValidator PV_ES = new IntegerValidator(1, Integer.MAX_VALUE).setName("execution start").setExampleValue("300").setDescription("amount of seconds until (or unix timestamp for) end of assembly phase and start of execution phase"),
+            PV_HPD = new IntegerValidator(1, Integer.MAX_VALUE).setName("hash period duration").setExampleValue("30").setDescription("amount of seconds each hash period (first part of the epoch) lasts"),
+            PV_RPD = new IntegerValidator(1, Integer.MAX_VALUE).setName("result period duration").setExampleValue("30").setDescription("amount of seconds each result period (second part of the epoch) lasts"),
+            PV_RL = new IntegerValidator(1, Integer.MAX_VALUE).setName("runtime limit").setExampleValue("10").setDescription("maximum amount of seconds the QLVM is allowed to run per epoch before aborting (to prevent endless loops)");
+
+
     private static final CallValidator CV = new CallValidator(new ParameterValidator[]{
-            new IntegerValidator(1, Integer.MAX_VALUE).setName("execution start"),
-            new IntegerValidator(1, Integer.MAX_VALUE).setName("hash period duration"),
-            new IntegerValidator(1, Integer.MAX_VALUE).setName("result period duration"),
-            new IntegerValidator(1, Integer.MAX_VALUE).setName("runtime limit"),
-            new StringValidator().setName("code"),
+            PV_ES, PV_HPD, PV_RPD, PV_RL, new StringValidator().setName("code").setExampleValue("return(epoch^2);").setDescription("the qubic code to run"),
     });
 
     private static final CallValidator CV_TERMINAL = new CallValidator(new ParameterValidator[]{
-            new IntegerValidator(1, Integer.MAX_VALUE).setName("execution start").setExampleValue("300").setDescription("amount of seconds until (or unix timestamp for) end of assembly phase and start of execution phase"),
-            new IntegerValidator(1, Integer.MAX_VALUE).setName("hash period duration").setExampleValue("30").setDescription("amount of seconds each hash period (first part of the epoch) lasts"),
-            new IntegerValidator(1, Integer.MAX_VALUE).setName("result period duration").setExampleValue("30").setDescription("amount of seconds each result period (second part of the epoch) lasts"),
-            new IntegerValidator(1, Integer.MAX_VALUE).setName("runtime limit").setExampleValue("10").setDescription("maximum amount of seconds the QLVM is allowed to run per epoch before aborting (to prevent endless loops)"),
-            new FilePathValidator().setName("code path").setExampleValue("../my_qubic.ql").setDescription("file containing the qubic code (absolute path or path relative to .jar file)"),
+            PV_ES, PV_HPD, PV_RPD, PV_RL, new FilePathValidator().setName("code path").setExampleValue("../my_qubic.ql").setDescription("file containing the qubic code (absolute path or path relative to .jar file)"),
     });
 
     @Override
@@ -56,7 +57,7 @@ public class CommandQubicCreate extends Command {
 
     @Override
     public String getDescription() {
-        return "creates a new qubic and stores it in the persistence. life cycle will not be automized: do the assembly transaction manually";
+        return "Creates a new qubic and stores it in the persistence. life cycle will not be automized: do the assembly transaction manually.";
     }
 
     @Override
@@ -67,17 +68,17 @@ public class CommandQubicCreate extends Command {
         QubicWriter qw = persistence.findQubicWriterByHandle(responseQC.getQubicID());
 
         println("created qubic with id:  '" + responseQC.getQubicID() + "'");
-        println("qubic transaction:      '" + qw.getQubicTxHash() + "'");
-        println("execution starts in      " + (int)(qw.getExecutionStart()-System.currentTimeMillis()/1000) + " seconds");
+        println("qubic transaction:      '" + qw.getQubicTransactionHash() + "'");
+        println("execution starts in      " + qw.getSpecification().timeUntilExecutionStart()+ " seconds");
     }
 
     @Override
     public ResponseAbstract perform(Persistence persistence, Map<String, Object> parMap) {
 
-        int executionStart = (int)parMap.get("execution_start");
-        int hashPeriodDuration = (int)parMap.get("hash_period_duration");
-        int resultPeriodDuration = (int)parMap.get("result_period_duration");
-        int runTimeLimit = (int)parMap.get("runtime_limit");
+        int executionStart = (int)parMap.get(PV_ES.getJSONKey());
+        int hashPeriodDuration = (int)parMap.get(PV_HPD.getJSONKey());
+        int resultPeriodDuration = (int)parMap.get(PV_RPD.getJSONKey());
+        int runTimeLimit = (int)parMap.get(PV_RL.getJSONKey());
         String codePath = (String)parMap.get("code_path");
 
         final long currentTimeMillis = System.currentTimeMillis()/1000;
@@ -99,11 +100,23 @@ public class CommandQubicCreate extends Command {
         if (executionStart < currentTimeMillis)
             executionStart += currentTimeMillis;
 
-        QubicWriter qw = new QubicWriter(executionStart, hashPeriodDuration, resultPeriodDuration, runTimeLimit);
-        qw.setCode(code);
+        QubicWriter qw = new QubicWriter();
+
+        EditableQubicSpecification eqs = qw.getEditable();
+        eqs.setExecutionStartUnix(executionStart);
+        eqs.setHashPeriodDuration(hashPeriodDuration);
+        eqs.setResultPeriodDuration(resultPeriodDuration);
+        eqs.setRuntimeLimit(runTimeLimit);
+        qw.getEditable().setCode(code);
+
         persistence.addQubicWriter(qw);
-        qw.publishQubicTx();
+        qw.publishQubicTransaction();
 
         return new ResponseQubicCreate(qw.getID());
+    }
+
+    @Override
+    public ResponseSuccess getSuccessResponseExample() {
+        return new ResponseQubicCreate(TryteTool.generateRandom(81));
     }
 }

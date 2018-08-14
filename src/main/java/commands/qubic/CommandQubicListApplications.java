@@ -2,6 +2,7 @@ package commands.qubic;
 
 import api.resp.general.ResponseAbstract;
 import api.resp.general.ResponseError;
+import api.resp.general.ResponseSuccess;
 import api.resp.qubic.ResponseQubicListApplications;
 import commands.Command;
 import commands.param.CallValidator;
@@ -13,16 +14,26 @@ import main.Persistence;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import qubic.QubicWriter;
+import tangle.TryteTool;
 
 import java.util.Map;
 
-public class CommandQubicListApplications extends Command {
+public class CommandQubicListApplications extends CommandQubicAbstract {
 
     public static final CommandQubicListApplications instance = new CommandQubicListApplications();
 
     private static final CallValidator CV = new CallValidator(new ParameterValidator[]{
-        new TryteValidator(1, 81).setName("qubic handle").setExampleValue("G9").setDescription("the qubic from which you want to read and list all applications"),
+            new TryteValidator(81, 81).setName("qubic").setDescription("the qubic of which you want to list all applications"),
     });
+
+    private static final CallValidator CV_TERMINAL = new CallValidator(new ParameterValidator[]{
+            new TryteValidator(1, 81).setName("qubic").setDescription("the qubic of which you want to list all applications"),
+    });
+
+    @Override
+    public CallValidator getCallValidatorForTerminal() {
+        return CV_TERMINAL;
+    }
 
     @Override
     public CallValidator getCallValidator() {
@@ -41,7 +52,7 @@ public class CommandQubicListApplications extends Command {
 
     @Override
     public String getDescription() {
-        return "lists all incoming oracle applications for a specific qubic, basis for '" + CommandQubicAssemblyAdd.instance.getName() + "'";
+        return "Lists all incoming oracle applications for a specific qubic, response can be used for '" + CommandQubicAssemblyAdd.instance.getName() + "'.";
     }
 
     @Override
@@ -59,15 +70,23 @@ public class CommandQubicListApplications extends Command {
 
     @Override
     public ResponseAbstract perform(Persistence persistence, Map<String, Object> parMap) {
-        String qubic = (String)parMap.get("qubic_handle");
+        String qubic = (String)parMap.get("qubic");
         QubicWriter qw = persistence.findQubicWriterByHandle(qubic);
         if(qw == null)
             return new ResponseError("you do not own a qubic with the id '"+qubic+"'");
 
         qw.fetchApplications();
         JSONArray arr = new JSONArray();
-        for (JSONObject o : qw.getApplications())
+        for (JSONObject o : qw.fetchApplications())
             arr.put(o);
+        return new ResponseQubicListApplications(arr);
+    }
+
+    @Override
+    public ResponseSuccess getSuccessResponseExample() {
+        JSONArray arr = new JSONArray();
+        arr.put(TryteTool.generateRandom(81));
+        arr.put(TryteTool.generateRandom(81));
         return new ResponseQubicListApplications(arr);
     }
 

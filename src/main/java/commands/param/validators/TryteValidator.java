@@ -1,6 +1,7 @@
 package commands.param.validators;
 
 import commands.param.ParameterValidator;
+import tangle.TryteTool;
 
 public class TryteValidator extends ParameterValidator {
 
@@ -10,6 +11,7 @@ public class TryteValidator extends ParameterValidator {
     public TryteValidator(int minLength, int maxLength) {
         this.minLength = minLength;
         this.maxLength = maxLength;
+        setExampleValue(TryteTool.generateRandom(Math.min(minLength+1, maxLength)));
     }
 
     @Override
@@ -17,13 +19,8 @@ public class TryteValidator extends ParameterValidator {
 
         par = par.toUpperCase();
 
-        char[] trytes = "ABCDEFGHIJKLMNOPQRSTUVWXYZ9".toCharArray();
-
-        for(int i = 0; i < par.length(); i++) {
-            char c = par.charAt(i);
-            if((c < 'A' || c > 'Z') && c != '9')
-                return "'"+par+"' is not a tryte sequence: contains illegal character '"+c+"'";
-        }
+        if(!TryteTool.isTryteSequence(par))
+            return "'"+par+"' is not a tryte sequence: contains illegal character";
 
         if(par.length() < minLength || par.length() > maxLength)
             return "length of "+buildRequiredLengthString()+" trytes required, but length of '"+par+"' is " + par.length();
@@ -43,6 +40,11 @@ public class TryteValidator extends ParameterValidator {
 
     @Override
     public String toString() {
-        return buildRequiredLengthString() + " TRYTES";
+        return "Trytes{"+buildRequiredLengthString()+"}";
+    }
+
+    @Override
+    public String genJSValidation() {
+        return "_ParameterValidator.validate_tryte_sequence("+getJSONKey()+", '"+getJSONKey()+"', "+minLength+", "+maxLength+");";
     }
 }

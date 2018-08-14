@@ -2,6 +2,7 @@ package commands.qubic;
 
 import api.resp.general.ResponseAbstract;
 import api.resp.general.ResponseError;
+import api.resp.general.ResponseSuccess;
 import api.resp.qubic.ResponseQubicQuickRun;
 import commands.Command;
 import commands.param.CallValidator;
@@ -10,17 +11,19 @@ import commands.param.validators.FilePathValidator;
 import main.Persistence;
 import oracle.OracleManager;
 import oracle.OracleWriter;
+import qubic.EditableQubicSpecification;
 import qubic.QubicReader;
 import qubic.QubicWriter;
+import tangle.TryteTool;
 
 import java.util.Map;
 
-public class CommandQubicQuickRun extends Command {
+public class CommandQubicQuickRun extends CommandQubicAbstract {
 
     public static final CommandQubicQuickRun instance = new CommandQubicQuickRun();
 
     private static final CallValidator CV = new CallValidator(new ParameterValidator[]{
-        new FilePathValidator().setName("qubic code").setExampleValue("../my_qubic.ql").setDescription("file containing the qubic code you want to quick run (absolute path or path relative to .jar file)"),
+        new FilePathValidator().setName("code").setExampleValue("../my_qubic.ql").setDescription("file containing the qubic code you want to quick run (absolute path or path relative to .jar file)"),
     });
 
     @Override
@@ -40,7 +43,7 @@ public class CommandQubicQuickRun extends Command {
 
     @Override
     public String getDescription() {
-        return "runs a minimalistic qubic (will not be added to the persistence), automates the full qubic life cycle to allow the author to quickly test whether the code works as intended. only one oracle will be added to the assembly.";
+        return "Runs a minimalistic qubic, automates the full qubic life cycle to allow the author to quickly test whether the code works as intended. Only one oracle will be added to the assembly.";
     }
 
     @Override
@@ -62,23 +65,36 @@ public class CommandQubicQuickRun extends Command {
     public ResponseAbstract perform(Persistence persistence, Map<String, Object> parMap) {
 
 
-        String codePath = (String)parMap.get("qubic_code");
+        String codePath = (String)parMap.get("code");
 
         String code = persistence.readFile(codePath);
 
         if(code == null)
             return new ResponseError("qubic test failed: could not read code from file");
 
-        QubicWriter qw = new QubicWriter(30+(int)(System.currentTimeMillis()/1000), 20, 10, 10);
-        qw.setCode(code);
-        qw.publishQubicTx();
+        QubicWriter qw = new QubicWriter();
+        EditableQubicSpecification eqs = qw.getEditable();
+
+        eqs.setExecutionStartToSecondsInFuture(20);
+        eqs.setRuntimeLimit(10);
+        eqs.setHashPeriodDuration(15);
+        eqs.setResultPeriodDuration(5);
+        eqs.setCode(code);
 
         OracleWriter ow = new OracleWriter(new QubicReader(qw.getID()));
-        qw.addToAssembly(ow.getID());
-        qw.publishAssemblyTx();
+        qw.getAssembly().add(ow.getID());
+        qw.publishAssemblyTransaction();
 
         new OracleManager(ow).start();
 
+        persistence.addOracleWriter(ow);
+        persistence.addQubicWriter(qw);
+
         return new ResponseQubicQuickRun(qw.getID(), ow.getID());
+    }
+
+    @Override
+    public ResponseSuccess getSuccessResponseExample() {
+        return new ResponseQubicQuickRun(TryteTool.generateRandom(81), TryteTool.generateRandom(81));
     }
 }

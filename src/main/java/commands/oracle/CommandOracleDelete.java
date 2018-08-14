@@ -12,17 +12,26 @@ import oracle.OracleWriter;
 
 import java.util.Map;
 
-public class CommandOracleDelete extends Command {
+public class CommandOracleDelete extends CommandOracleAbstract {
 
     public static final CommandOracleDelete instance = new CommandOracleDelete();
 
     private static final CallValidator CV = new CallValidator(new ParameterValidator[]{
-        new TryteValidator(1, 81).setName("oracle handle").setExampleValue("JR").setDescription("deletes the oracle that starts with this tryte sequence"),
+            new TryteValidator(81, 81).setName("id").setDescription("oracle ID"),
+    });
+
+    private static final CallValidator CV_TERMINAL = new CallValidator(new ParameterValidator[]{
+        new TryteValidator(1, 81).setName("id").setExampleValue("JR").setDescription("deletes the oracle that starts with this tryte sequence"),
     });
 
     @Override
     public CallValidator getCallValidator() {
         return CV;
+    }
+
+    @Override
+    public CallValidator getCallValidatorForTerminal() {
+        return CV_TERMINAL;
     }
 
     @Override
@@ -37,7 +46,7 @@ public class CommandOracleDelete extends Command {
 
     @Override
     public String getDescription() {
-        return "removes an oracle from the persistence (oracle's private key will be deleted: cannot be undone)";
+        return "Removes an oracle from the persistence (private key will be deleted, cannot be undone).";
     }
 
     @Override
@@ -47,7 +56,7 @@ public class CommandOracleDelete extends Command {
 
     @Override
     public ResponseAbstract perform(Persistence persistence, Map<String, Object> parMap) {
-        String oracleID = (String)parMap.get("oracle_handle");
+        String oracleID = (String)parMap.get("id");
         OracleWriter ow = persistence.findOracleWriterByHandle(oracleID);
 
         if(ow == null)

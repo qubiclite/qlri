@@ -1,8 +1,8 @@
 package api.resp.qubic;
 
-import api.resp.general.ResponseAbstract;
+import api.resp.general.ResponseSuccess;
 
-public class ResponseQubicCreate extends ResponseAbstract {
+public class ResponseQubicCreate extends ResponseSuccess {
 
     public ResponseQubicCreate(String qubicID) {
         obj.put("qubic_id", qubicID);

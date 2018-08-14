@@ -11,21 +11,21 @@ import commands.param.validators.TryteValidator;
 import main.Persistence;
 import org.json.JSONArray;
 import qubic.QubicWriter;
+import tangle.TryteTool;
 
 import java.util.Map;
 
-public class CommandQubicAssemble extends Command {
+public class CommandQubicAssemble extends CommandQubicAbstract {
 
     public static final CommandQubicAssemble instance = new CommandQubicAssemble();
 
+    private static final ParameterValidator  PV_QH = new TryteValidator(1, 81).setName("qubic handle").setDescription("the qubic that shall publish its assembly transaction");
+
     private static final CallValidator CV = new CallValidator(new ParameterValidator[]{
-        new TryteValidator(1, 81).setName("qubic handle").setExampleValue("G9").setDescription("the qubic that shall publish its assembly transaction"),
-        new JSONArrayValidator().setName("assembly").setExampleValue("['AD…9', 'BC…9']").setDescription("json array of the oracle IDs to be part of the assembly")
+        PV_QH, new JSONArrayValidator().setName("assembly").setExampleValue("['"+TryteTool.generateRandom(81) +"', '"+TryteTool.generateRandom(81)+"']").setDescription("json array of the oracle IDs to be part of the assembly")
     });
 
-    private static final CallValidator CV_TERMINAL = new CallValidator(new ParameterValidator[]{
-            new TryteValidator(1, 81).setName("qubic handle").setExampleValue("G9").setDescription("the qubic that shall publish its assembly transaction"),
-    });
+    private static final CallValidator CV_TERMINAL = new CallValidator(new ParameterValidator[]{ PV_QH });
 
     @Override
     public CallValidator getCallValidatorForTerminal() {
@@ -49,7 +49,7 @@ public class CommandQubicAssemble extends Command {
 
     @Override
     public String getDescription() {
-        return "publishes the assembly transaction for a specific qubic";
+        return "Publishes the assembly transaction for a specific qubic.";
     }
 
     @Override
@@ -58,13 +58,13 @@ public class CommandQubicAssemble extends Command {
         String handle = par[1];
         QubicWriter qw = persistence.findQubicWriterByHandle(handle);
 
-        println("assembly transaction created: '"+qw.getAssemblyTxHash()+"'");
+        println("assembly transaction created: '"+qw.getAssemblyTransactionHash()+"'");
     }
 
     @Override
     public ResponseAbstract perform(Persistence persistence, Map<String, Object> parMap) {
 
-        String qubicHandle = (String)parMap.get("qubic_handle");
+        String qubicHandle = (String)parMap.get(PV_QH.getJSONKey());
         JSONArray assembly = (JSONArray)parMap.get("assembly");
 
         QubicWriter qw = persistence.findQubicWriterByHandle(qubicHandle);
@@ -73,10 +73,10 @@ public class CommandQubicAssemble extends Command {
 
         if(assembly != null)
             for(int i = 0; i < assembly.length(); i++)
-                qw.addToAssembly(assembly.getString(i)); // TODO check if indeed is string
+                qw.getAssembly().add(assembly.getString(i)); // TODO check if indeed is string
 
         try {
-            qw.publishAssemblyTx();
+            qw.publishAssemblyTransaction();
         } catch (Exception e) {
             return new ResponseError(e.getClass().getName() + ": " + e.getMessage());
         }

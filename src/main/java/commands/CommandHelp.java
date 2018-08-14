@@ -36,7 +36,7 @@ public class CommandHelp extends Command {
 
     @Override
     public String getDescription() {
-        return "helps the user by listing all available commands and providing details to any specific command";
+        return "Helps the user by listing all available commands and providing details to any specific command.";
     }
 
     @Override

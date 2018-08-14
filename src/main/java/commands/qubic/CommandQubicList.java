@@ -1,6 +1,7 @@
 package commands.qubic;
 
 import api.resp.general.ResponseAbstract;
+import api.resp.general.ResponseSuccess;
 import api.resp.qubic.ResponseQubicList;
 import commands.Command;
 import commands.param.CallValidator;
@@ -10,17 +11,26 @@ import main.Persistence;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import qubic.QubicWriter;
+import tangle.TryteTool;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-public class CommandQubicList extends Command {
+public class CommandQubicList extends CommandQubicAbstract {
 
     public static final CommandQubicList instance = new CommandQubicList();
 
-    private static final CallValidator CV = new CallValidator(new ParameterValidator[]{
-        new TryteValidator(1, 81).setName("qubic id filter").setExampleValue("G9").setDescription("filters the list and only shows the qubics starting with this sequence").makeOptional("")
+    private static final CallValidator CV = new CallValidator(new ParameterValidator[]{ });
+
+    private static final CallValidator CV_TERMINAL = new CallValidator(new ParameterValidator[]{
+            new TryteValidator(0, 81).setName("filter").setDescription("filters the list and only shows the qubics starting with this sequence").makeOptional("")
     });
+
+    @Override
+    public CallValidator getCallValidatorForTerminal() {
+        return CV_TERMINAL;
+    }
 
     @Override
     public CallValidator getCallValidator() {
@@ -39,7 +49,7 @@ public class CommandQubicList extends Command {
 
     @Override
     public String getDescription() {
-        return "prints the full list of all qubics stored in the persistence";
+        return "Lists all qubics stored in the persistence.";
     }
 
     @Override
@@ -58,8 +68,8 @@ public class CommandQubicList extends Command {
 
     @Override
     public ResponseAbstract perform(Persistence persistence, Map<String, Object> parMap) {
-        String handle = (String)parMap.get("qubic_id_filter");
-        ArrayList<QubicWriter> qws = persistence.findAllQubicWritersWithHandle(handle);
+        String filter = (String)parMap.get("filter");
+        List<QubicWriter> qws = persistence.findAllQubicWritersWithHandle(filter != null ? filter : "");
         JSONArray arr = new JSONArray();
 
         for(QubicWriter qw : qws) {
@@ -69,6 +79,14 @@ public class CommandQubicList extends Command {
             arr.put(oracleObject);
         }
 
+        return new ResponseQubicList(arr);
+    }
+
+    @Override
+    public ResponseSuccess getSuccessResponseExample() {
+        JSONArray arr = new JSONArray();
+        arr.put(TryteTool.generateRandom(81));
+        arr.put(TryteTool.generateRandom(81));
         return new ResponseQubicList(arr);
     }
 }

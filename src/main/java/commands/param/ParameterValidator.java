@@ -35,10 +35,16 @@ public abstract class ParameterValidator {
         return name.toLowerCase().replace(' ', '_');
     }
 
+    public String genJSValidation() {return null;}
+
+    public String getJSType() {
+        return "string";
+    }
+
     public abstract Object convertParToObject(String par);
 
     public String getName() {
-        return name + (optional ? " [OPTIONAL]" : "");
+        return name;
     }
 
     public String getDescription() {

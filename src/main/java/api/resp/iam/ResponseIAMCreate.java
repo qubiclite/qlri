@@ -1,8 +1,8 @@
 package api.resp.iam;
 
-import api.resp.general.ResponseAbstract;
+import api.resp.general.ResponseSuccess;
 
-public class ResponseIAMCreate extends ResponseAbstract {
+public class ResponseIAMCreate extends ResponseSuccess {
 
     public ResponseIAMCreate(String iamID) {
         obj.put("iam_id", iamID);

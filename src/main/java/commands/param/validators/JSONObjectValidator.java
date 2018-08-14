@@ -24,6 +24,16 @@ public class JSONObjectValidator extends ParameterValidator {
 
     @Override
     public String toString() {
-        return "JSON OBJECT";
+        return "JSONObject";
+    }
+
+    @Override
+    public String genJSValidation() {
+        return "_ParameterValidator.validate_object("+getJSONKey()+", '"+getJSONKey()+"');";
+    }
+
+    @Override
+    public String getJSType() {
+        return "object";
     }
 }

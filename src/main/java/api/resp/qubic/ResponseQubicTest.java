@@ -1,8 +1,9 @@
 package api.resp.qubic;
 
 import api.resp.general.ResponseAbstract;
+import api.resp.general.ResponseSuccess;
 
-public class ResponseQubicTest extends ResponseAbstract {
+public class ResponseQubicTest extends ResponseSuccess {
 
     public ResponseQubicTest(String result, long runtime) {
         obj.put("result", result);

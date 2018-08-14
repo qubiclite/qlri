@@ -1,21 +1,25 @@
 package api.resp.qubic;
 
 import api.resp.general.ResponseAbstract;
+import api.resp.general.ResponseSuccess;
 import org.json.JSONArray;
 import qubic.QubicReader;
+import qubic.QubicSpecification;
 
-public class ResponseQubicRead extends ResponseAbstract {
+public class ResponseQubicRead extends ResponseSuccess {
 
     public ResponseQubicRead(QubicReader qr) {
-        obj.put("id", qr.getID());
-        obj.put("application_address", qr.getApplicationAddress());
-        obj.put("code", qr.getCode());
-        obj.put("version", qr.getVersion());
 
-        obj.put("execution_start", qr.getExecutionStart());
-        obj.put("hash_period_duration", qr.getHashPeriodDuration());
-        obj.put("result_period_duration", qr.getResultPeriodDuration());
-        obj.put("runtime_limit", qr.getRunTimeLimit());
+        QubicSpecification spec = qr.getSpecification();
+
+        obj.put("id", qr.getID());
+        obj.put("code", spec.getCode());
+        obj.put("version", spec.getVersion());
+
+        obj.put("execution_start", spec.getExecutionStartUnix());
+        obj.put("hash_period_duration", spec.getHashPeriodDuration());
+        obj.put("result_period_duration", spec.getResultPeriodDuration());
+        obj.put("runtime_limit", spec.getRuntimeLimit());
 
         obj.put("assembly_list", qr.getAssemblyList());
     }

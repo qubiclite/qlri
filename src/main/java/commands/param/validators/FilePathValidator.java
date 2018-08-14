@@ -24,6 +24,11 @@ public class FilePathValidator extends ParameterValidator {
 
     @Override
     public String toString() {
-        return "FILE PATH";
+        return "FilePath";
+    }
+
+    @Override
+    public String genJSValidation() {
+        return "_ParameterValidator.validate_string("+getJSONKey()+", '"+getJSONKey()+"');";
     }
 }

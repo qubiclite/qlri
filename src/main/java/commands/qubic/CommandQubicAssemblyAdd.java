@@ -12,13 +12,13 @@ import qubic.QubicWriter;
 
 import java.util.Map;
 
-public class CommandQubicAssemblyAdd extends Command {
+public class CommandQubicAssemblyAdd extends CommandQubicAbstract {
 
     public static final CommandQubicAssemblyAdd instance = new CommandQubicAssemblyAdd();
 
     private static final CallValidator CV = new CallValidator(new ParameterValidator[]{
-            new TryteValidator(1, 81).setName("qubic handle").setExampleValue("G9").setDescription("the qubic to whose assembly the oracle shall be added (finds the qubic starting with this tryte sequence)"),
-            new TryteValidator(81, 81).setName("oracle id").setExampleValue("TEL9U…FH999").setDescription("IAM stream identity of the oracle to add to the assembly"),
+            new TryteValidator(1, 81).setName("qubic handle").setDescription("the qubic to whose assembly the oracle shall be added (finds the qubic starting with this tryte sequence)"),
+            new TryteValidator(81, 81).setName("oracle id").setDescription("IAM stream identity of the oracle to add to the assembly"),
     });
 
     @Override
@@ -38,7 +38,7 @@ public class CommandQubicAssemblyAdd extends Command {
 
     @Override
     public String getDescription() {
-        return "adds an oracle to the assembly as preparation for '" + CommandQubicAssemble.instance.getName() + "'";
+        return "Adds an oracle to the assembly as preparation for '" + CommandQubicAssemble.instance.getName() + "'.";
     }
 
     @Override
@@ -56,7 +56,7 @@ public class CommandQubicAssemblyAdd extends Command {
         QubicWriter qw = persistence.findQubicWriterByHandle(qubicHandle);
 
         if (qw != null)
-            qw.addToAssembly(oracleID);
+            qw.getAssembly().add(oracleID);
 
         return new ResponseSuccess();
     }

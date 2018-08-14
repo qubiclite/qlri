@@ -1,16 +1,17 @@
 package commands.iam;
 
 import api.resp.general.ResponseAbstract;
+import api.resp.general.ResponseSuccess;
 import api.resp.iam.ResponseIAMCreate;
-import commands.Command;
 import commands.param.CallValidator;
 import commands.param.ParameterValidator;
+import iam.IAMWriter;
 import main.Persistence;
-import tangle.IAMPublisher;
+import tangle.TryteTool;
 
 import java.util.Map;
 
-public class CommandIAMCreate extends Command {
+public class CommandIAMCreate extends ComandIAMAbstract {
 
     public static final CommandIAMCreate instance = new CommandIAMCreate();
 
@@ -35,7 +36,7 @@ public class CommandIAMCreate extends Command {
 
     @Override
     public String getDescription() {
-        return "creates a new IAM stream and stores it in the persistence";
+        return "Creates a new IAM stream and stores it locally in the persistence.";
     }
 
     @Override
@@ -45,8 +46,13 @@ public class CommandIAMCreate extends Command {
 
     @Override
     public ResponseAbstract perform(Persistence persistence, Map<String, Object> parMap) {
-        IAMPublisher iamPublisher = new IAMPublisher();
-        persistence.addIAMPublisher(iamPublisher);
-        return new ResponseIAMCreate(iamPublisher.getID());
+        IAMWriter iamWriter = new IAMWriter();
+        persistence.addIAMPublisher(iamWriter);
+        return new ResponseIAMCreate(iamWriter.getID());
+    }
+
+    @Override
+    public ResponseSuccess getSuccessResponseExample() {
+        return new ResponseIAMCreate(TryteTool.generateRandom(81));
     }
 }

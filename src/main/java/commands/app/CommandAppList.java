@@ -2,7 +2,7 @@ package commands.app;
 
 import api.resp.app.ResponseAppList;
 import api.resp.general.ResponseAbstract;
-import commands.Command;
+import api.resp.general.ResponseSuccess;
 import commands.param.CallValidator;
 import commands.param.ParameterValidator;
 import main.App;
@@ -13,7 +13,7 @@ import org.json.JSONObject;
 import java.util.Collection;
 import java.util.Map;
 
-public class CommandAppList extends Command {
+public class CommandAppList extends ComandAppAbstract {
 
     public static final CommandAppList instance = new CommandAppList();
 
@@ -26,7 +26,7 @@ public class CommandAppList extends Command {
 
     @Override
     public String getName() {
-        return "apps_list";
+        return "app_list";
     }
 
     @Override
@@ -36,7 +36,7 @@ public class CommandAppList extends Command {
 
     @Override
     public String getDescription() {
-        return "prints the full list of all app installed";
+        return "Lists all apps installed.";
     }
 
     @Override
@@ -64,6 +64,23 @@ public class CommandAppList extends Command {
             json.put("license", app.getLicense());
             arr.put(json);
         }
+        return new ResponseAppList(arr);
+    }
+
+    @Override
+    public ResponseSuccess getSuccessResponseExample() {
+
+        JSONArray arr = new JSONArray();
+
+        JSONObject json = new JSONObject();
+        json.put("id", "tanglefarm");
+        json.put("title", "Tangle Farm");
+        json.put("description", "Grow and harvest food on your own farm. The first qApp and decentralized IOTA game. The game state is entirely stored on the Tangle and validated by Qubic Lite.");
+        json.put("version", "v0.1");
+        json.put("url", "http://qame.org/tanglefarm");
+        json.put("license", "&copy;2018 by microhash for qame.org");
+        arr.put(json);
+
         return new ResponseAppList(arr);
     }
 }

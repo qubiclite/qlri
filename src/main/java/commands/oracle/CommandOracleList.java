@@ -1,8 +1,8 @@
 package commands.oracle;
 
 import api.resp.general.ResponseAbstract;
+import api.resp.general.ResponseSuccess;
 import api.resp.oracle.ResponseOracleList;
-import commands.Command;
 import commands.param.CallValidator;
 import commands.param.ParameterValidator;
 import commands.param.validators.TryteValidator;
@@ -10,21 +10,30 @@ import main.Persistence;
 import oracle.OracleWriter;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import tangle.TryteTool;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-public class CommandOracleList extends Command {
+public class CommandOracleList extends CommandOracleAbstract {
 
     public static final CommandOracleList instance = new CommandOracleList();
 
-    private static final CallValidator CV = new CallValidator(new ParameterValidator[]{
-        new TryteValidator(1, 81).setName("oracle id filter").setExampleValue("JR").setDescription("filters the list and only shows the oracles starting with this sequence").makeOptional("")
+    private static final CallValidator CV = new CallValidator(new ParameterValidator[]{ });
+
+    private static final CallValidator CV_TERMINAL = new CallValidator(new ParameterValidator[]{
+            new TryteValidator(0, 81).setName("filter").setDescription("filters the list and only shows the oracles starting with this sequence").makeOptional("")
     });
 
     @Override
     public CallValidator getCallValidator() {
         return CV;
+    }
+
+    @Override
+    public CallValidator getCallValidatorForTerminal() {
+        return CV_TERMINAL;
     }
 
     @Override
@@ -39,7 +48,7 @@ public class CommandOracleList extends Command {
 
     @Override
     public String getDescription() {
-        return "prints the full list of all oracles stored in the persistence";
+        return "Lists all oracles stored in the persistence";
     }
 
     @Override
@@ -59,8 +68,8 @@ public class CommandOracleList extends Command {
 
     @Override
     public ResponseAbstract perform(Persistence persistence, Map<String, Object> parMap) {
-        String oracleIDFilter = (String)parMap.get("oracle_id_filter");
-        ArrayList<OracleWriter> ows = persistence.findAllOracleWritersWithHandle(oracleIDFilter);
+        String filter = (String)parMap.get("filter");
+        List<OracleWriter> ows = persistence.findAllOracleWritersWithHandle(filter != null ? filter : "");
         JSONArray arr = new JSONArray();
         for(OracleWriter ow : ows) {
             JSONObject oracleObject = new JSONObject();
@@ -69,6 +78,14 @@ public class CommandOracleList extends Command {
             oracleObject.put("state", ow.getManager().getState());
             arr.put(oracleObject);
         }
+        return new ResponseOracleList(arr);
+    }
+
+    @Override
+    public ResponseSuccess getSuccessResponseExample() {
+        JSONArray arr = new JSONArray();
+        arr.put(TryteTool.generateRandom(81));
+        arr.put(TryteTool.generateRandom(81));
         return new ResponseOracleList(arr);
     }
 }

@@ -4,16 +4,13 @@ import api.resp.general.ResponseAbstract;
 import api.resp.general.ResponseError;
 import commands.Command;
 import commands.param.CallValidator;
-import io.undertow.server.HttpHandler;
 import io.undertow.Undertow;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.*;
 import main.Main;
 import main.Persistence;
-import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
-import sun.nio.ch.ChannelInputStream;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -22,7 +19,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,58 +27,45 @@ import static io.undertow.Handlers.path;
 public class API {
 
     private static final int MAX_BODY_LENGTH = 10000;
-    private Undertow undertow;
+    private final Undertow undertowAPI;
     private final Persistence persistence;
 
-    public API(Persistence persistence, String host, int port) {
+    public API(Persistence persistence, String host, int port)  throws UnknownHostException {
 
         this.persistence = persistence;
 
         if(host == null)
-            try {
-                host = InetAddress.getLocalHost().getHostAddress();
-            } catch (UnknownHostException e) {
-                e.printStackTrace();
-                return;
-            }
+            host = InetAddress.getLocalHost().getHostAddress();
 
         Main.println("starting api listener for '"+host+':'+port+"'");
 
-        // TODO credentials
-        undertow = Undertow.builder().addHttpListener(port, host).setHandler(path().addPrefixPath("/", new HttpHandler() {
-
+        undertowAPI = Undertow.builder().addHttpListener(port, host).setHandler(path().addPrefixPath("/", new HttpHandlerImplementation(){
             @Override
-            public void handleRequest(final HttpServerExchange exchange) throws Exception {
-
-                if (exchange.isInIoThread()) {
-                    exchange.dispatch(this);
-                    return;
-                }
-
-                ChannelInputStream channelInputStream = new ChannelInputStream(exchange.getRequestChannel());
-                String request = IOUtils.toString(channelInputStream, StandardCharsets.UTF_8);
-
-                if(request.length() == 0) {
-                    sendFile(exchange);
-                } else {
+            void processRequest(HttpServerExchange exchange, String request) {
+                if(exchange.getRequestURI().replace("/", "").length() > 0)
+                    try {
+                        sendFile(exchange);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                else {
                     long timeStarted = System.currentTimeMillis();
                     ResponseAbstract response = processRawRequest(request, exchange);
                     String responseString = response.toJSON().put("duration", System.currentTimeMillis()-timeStarted).toString();
                     exchange.getResponseSender().send(responseString);
                 }
-
             }
         })).build();
 
         try {
-            undertow.start();
+            undertowAPI.start();
         } catch (RuntimeException e) {
             Main.err("starting api failed" + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private void sendFile(HttpServerExchange exchange) throws IOException {
+    private static void sendFile(HttpServerExchange exchange) throws IOException {
 
         String uri = exchange.getRequestURI();
 

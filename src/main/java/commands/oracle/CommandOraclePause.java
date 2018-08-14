@@ -11,19 +11,29 @@ import main.Persistence;
 import oracle.OracleWriter;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-public class CommandOraclePause extends Command {
+public class CommandOraclePause extends CommandOracleAbstract {
 
     public static final CommandOraclePause instance = new CommandOraclePause();
 
     private static final CallValidator CV = new CallValidator(new ParameterValidator[]{
-        new TryteValidator(1, 81).setName("oracle handle").setExampleValue("JR").setDescription("pauses the oracle that starts with this tryte sequence"),
+            new TryteValidator(81, 81).setName("id").setDescription("oracle ID"),
+    });
+
+    private static final CallValidator CV_TERMINAL = new CallValidator(new ParameterValidator[]{
+            new TryteValidator(1, 81).setName("id").setExampleValue("JR").setDescription("pauses the oracle that starts with this tryte sequence"),
     });
 
     @Override
     public CallValidator getCallValidator() {
         return CV;
+    }
+
+    @Override
+    public CallValidator getCallValidatorForTerminal() {
+        return CV_TERMINAL;
     }
 
     @Override
@@ -38,7 +48,7 @@ public class CommandOraclePause extends Command {
 
     @Override
     public String getDescription() {
-        return "temporarily stops an oracle from processing its qubic, can be undone with '" + CommandOracleRestart.instance.getName() + "'";
+        return "Temporarily stops an oracle from processing its qubic after the epoch finishes. Can be undone with '" + CommandOracleRestart.instance.getName() + "'.";
     }
 
     @Override
@@ -50,8 +60,8 @@ public class CommandOraclePause extends Command {
     @Override
     public ResponseAbstract perform(Persistence persistence, Map<String, Object> parMap) {
 
-        String oracleHandle = (String)parMap.get("oracle_handle");
-        ArrayList<OracleWriter> ows = persistence.findAllOracleWritersWithHandle(oracleHandle);
+        String oracleHandle = (String)parMap.get("id");
+        List<OracleWriter> ows = persistence.findAllOracleWritersWithHandle(oracleHandle);
 
         if(ows.size() != 1)
             return new ResponseError("there are "+ows.size()+" oracles with the handle '"+oracleHandle+"'");

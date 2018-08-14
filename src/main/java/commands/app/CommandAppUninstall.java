@@ -22,12 +22,12 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Map;
 
-public class CommandAppUninstall extends Command {
+public class CommandAppUninstall extends ComandAppAbstract {
 
     public static final CommandAppUninstall instance = new CommandAppUninstall();
 
     private static final CallValidator CV = new CallValidator(new ParameterValidator[]{
-        new AlphaNumericValidator().setName("app").setDescription("the id (directory name in "+Persistence.APP_DIR_PATH+") of the app to deinstall").setExampleValue("tanglefarm")
+        new AlphaNumericValidator().setName("app").setDescription("app ID (directory name in '"+Persistence.APP_DIR_PATH+"')").setExampleValue("tanglefarm")
     });
 
     @Override
@@ -47,7 +47,7 @@ public class CommandAppUninstall extends Command {
 
     @Override
     public String getDescription() {
-        return "uninstalls an app";
+        return "Uninstalls an app.";
     }
 
     @Override

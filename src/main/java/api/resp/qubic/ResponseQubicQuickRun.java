@@ -1,8 +1,8 @@
 package api.resp.qubic;
 
-import api.resp.general.ResponseAbstract;
+import api.resp.general.ResponseSuccess;
 
-public class ResponseQubicQuickRun extends ResponseAbstract {
+public class ResponseQubicQuickRun extends ResponseSuccess {
 
     public ResponseQubicQuickRun(String qubicID, String oracleID) {
         obj.put("qubic_id", qubicID);

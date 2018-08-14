@@ -23,6 +23,16 @@ public class JSONArrayValidator extends ParameterValidator {
 
     @Override
     public String toString() {
-        return "JSON ARRAY";
+        return "JSONArray";
+    }
+
+    @Override
+    public String genJSValidation() {
+        return "_ParameterValidator.validate_array("+getJSONKey()+", '"+getJSONKey()+"');";
+    }
+
+    @Override
+    public String getJSType() {
+        return "array";
     }
 }

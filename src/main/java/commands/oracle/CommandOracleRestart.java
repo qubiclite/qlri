@@ -3,28 +3,35 @@ package commands.oracle;
 import api.resp.general.ResponseAbstract;
 import api.resp.general.ResponseError;
 import api.resp.general.ResponseSuccess;
-import commands.Command;
 import commands.param.CallValidator;
 import commands.param.ParameterValidator;
 import commands.param.validators.TryteValidator;
 import main.Persistence;
-import oracle.OracleManager;
 import oracle.OracleWriter;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-public class CommandOracleRestart extends Command {
+public class CommandOracleRestart extends CommandOracleAbstract {
 
     public static final CommandOracleRestart instance = new CommandOracleRestart();
 
     private static final CallValidator CV = new CallValidator(new ParameterValidator[]{
-            new TryteValidator(1, 81).setName("oracle handle").setExampleValue("JR").setDescription("restarts the oracle that starts with this tryte sequence"),
+            new TryteValidator(81, 81).setName("id").setDescription("oracle ID"),
+    });
+
+    private static final CallValidator CV_TERMINAL = new CallValidator(new ParameterValidator[]{
+            new TryteValidator(1, 81).setName("id").setExampleValue("JR").setDescription("restarts the oracle that starts with this tryte sequence"),
     });
 
     @Override
     public CallValidator getCallValidator() {
         return CV;
+    }
+
+    @Override
+    public CallValidator getCallValidatorForTerminal() {
+        return CV_TERMINAL;
     }
 
     @Override
@@ -39,7 +46,7 @@ public class CommandOracleRestart extends Command {
 
     @Override
     public String getDescription() {
-        return "restarts an oracle that was paused with '"+ CommandOraclePause.instance.getName() +"', makes it process its qubic again";
+        return "Restarts an oracle that was paused with '"+ CommandOraclePause.instance.getName() +"', makes it process its qubic again.";
     }
 
     @Override
@@ -52,7 +59,7 @@ public class CommandOracleRestart extends Command {
     public ResponseAbstract perform(Persistence persistence, Map<String, Object> parMap) {
 
         String oracleHandle = (String)parMap.get("oracle_handle");
-        ArrayList<OracleWriter> ows = persistence.findAllOracleWritersWithHandle(oracleHandle);
+        List<OracleWriter> ows = persistence.findAllOracleWritersWithHandle(oracleHandle);
 
         if(ows.size() != 1)
             return new ResponseError("there are "+ows.size()+" oracles with the handle '"+oracleHandle+"'");

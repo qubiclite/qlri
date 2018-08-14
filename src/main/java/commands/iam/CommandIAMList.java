@@ -1,29 +1,38 @@
 package commands.iam;
 
 import api.resp.general.ResponseAbstract;
+import api.resp.general.ResponseSuccess;
 import api.resp.iam.ResponseIAMList;
-import commands.Command;
 import commands.param.CallValidator;
 import commands.param.ParameterValidator;
 import commands.param.validators.TryteValidator;
+import iam.IAMWriter;
 import main.Persistence;
 import org.json.JSONArray;
-import tangle.IAMPublisher;
+import tangle.TryteTool;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-public class CommandIAMList extends Command {
+public class CommandIAMList extends ComandIAMAbstract {
 
     public static final CommandIAMList instance = new CommandIAMList();
 
-    private static final CallValidator CV = new CallValidator(new ParameterValidator[]{
-            new TryteValidator(1, 81).setName("iam stream id filter").setExampleValue("UW").setDescription("filters the list and only shows the oracles starting with this sequence").makeOptional("")
+    private static final CallValidator CV = new CallValidator(new ParameterValidator[]{ });
+
+    private static final CallValidator CV_TERMINAL = new CallValidator(new ParameterValidator[]{
+            new TryteValidator(0, 81).setName("filter").setExampleValue("UW").setDescription("filters the list and only returns IAM streams starting with this sequence").makeOptional("")
     });
 
     @Override
     public CallValidator getCallValidator() {
         return CV;
+    }
+
+    @Override
+    public CallValidator getCallValidatorForTerminal() {
+        return CV_TERMINAL;
     }
 
     @Override
@@ -38,7 +47,7 @@ public class CommandIAMList extends Command {
 
     @Override
     public String getDescription() {
-        return "prints the full list of all IAM streams stored in the persistence";
+        return "List all IAM streams stored in the persistence.";
     }
 
     @Override
@@ -52,11 +61,19 @@ public class CommandIAMList extends Command {
     }
 
     @Override
-    public ResponseAbstract perform(Persistence persistence, Map<String, Object> parMap) {
-        String iamStreamIDFilter = (String)parMap.get("iam_stream_id_filter");
-        ArrayList<IAMPublisher> ips = persistence.findAllIAMStreamsWithHandle(iamStreamIDFilter);
+    public ResponseSuccess getSuccessResponseExample() {
         JSONArray arr = new JSONArray();
-        for(IAMPublisher ip : ips)
+        arr.put(TryteTool.generateRandom(81));
+        arr.put(TryteTool.generateRandom(81));
+        return new ResponseIAMList(arr);
+    }
+
+    @Override
+    public ResponseAbstract perform(Persistence persistence, Map<String, Object> parMap) {
+        String filter = (String)parMap.get("filter");
+        List<IAMWriter> ips = persistence.findAllIAMStreamsWithHandle(filter != null ? filter : "");
+        JSONArray arr = new JSONArray();
+        for(IAMWriter ip : ips)
             arr.put(ip.getID());
         return new ResponseIAMList(arr);
     }

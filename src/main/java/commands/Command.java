@@ -2,18 +2,22 @@ package commands;
 
 import api.resp.general.ResponseAbstract;
 import api.resp.general.ResponseError;
+import api.resp.general.ResponseSuccess;
 import commands.app.CommandAppInstall;
 import commands.app.CommandAppList;
 import commands.app.CommandAppUninstall;
 import commands.iam.*;
 import commands.oracle.*;
 import commands.param.CallValidator;
+import commands.param.ParameterValidator;
 import commands.qubic.*;
 import main.Main;
 import main.Persistence;
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONObject;
 
 import java.util.Map;
+import java.util.StringJoiner;
 
 
 public abstract class Command {
@@ -110,16 +114,12 @@ public abstract class Command {
         return response;
     }
 
-    /**
-     * Just used to generate the command table for the README.md file.
-     * */
-    public static void printCommandTable() {
-        for (Command a : Command.COMMANDS) {
-            String name = StringUtils.rightPad('`'+a.getName()+'`', 25);
-            String alias = StringUtils.rightPad('`'+a.getAlias()+'`', 5);
-            String description = a.getDescription();
-            println("| " + name + " | " + alias + " | " + description);
-        }
+    public ResponseSuccess getSuccessResponseExample() {
+        return null;
+    }
+
+    public String getGroup() {
+        return "General";
     }
 
     /**

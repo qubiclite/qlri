@@ -33,6 +33,16 @@ public class IntegerValidator extends ParameterValidator {
 
     @Override
     public String toString() {
-        return "INTEGER ["+min+","+max+"]";
+        return "Integer{"+min+"-"+max+"}";
+    }
+
+    @Override
+    public String genJSValidation() {
+        return getJSONKey()+" = parseInt("+getJSONKey()+"); _ParameterValidator.validate_integer("+getJSONKey()+", '"+getJSONKey()+"', "+min+", "+max+");";
+    }
+
+    @Override
+    public String getJSType() {
+        return "int";
     }
 }

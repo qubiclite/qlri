@@ -1,8 +1,8 @@
 package api.resp.oracle;
 
-import api.resp.general.ResponseAbstract;
+import api.resp.general.ResponseSuccess;
 
-public class ResponseOracleCreate extends ResponseAbstract {
+public class ResponseOracleCreate extends ResponseSuccess {
 
     public ResponseOracleCreate(String oracleID) {
         obj.put("oracle_id", oracleID);

@@ -1,10 +1,12 @@
 package commands.param;
 
+import main.Main;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringJoiner;
 
 public class CallValidator {
 
@@ -32,7 +34,7 @@ public class CallValidator {
             if(parameterValidators[i].isOptional())
                 continue;
             String requiredParName = parameterValidators[i].getName();
-            if(!jsonObject.has(requiredParName))
+            if(!jsonObject.has(requiredParName) && !jsonObject.has( parameterValidators[i].getJSONKey()))
                 return "missing parameter '"+requiredParName+"'";
             String error = parameterValidators[i].validate(jsonObject.get(requiredParName).toString());
             if(error != null) return "parameter '"+requiredParName+"' is invalid: " + error;
@@ -82,6 +84,13 @@ public class CallValidator {
         return StringUtils.join(exampleValues, " ");
     }
 
+    public JSONObject buildExampleJSONRequest() {
+        JSONObject o = new JSONObject();
+        for(ParameterValidator pv : parameterValidators)
+            o.put(pv.getJSONKey(), pv.getExampleValue());
+        return o;
+    }
+
     public Map<String, Object> prepareParMap(Map<String, Object> parMap) {
         for(ParameterValidator pv : parameterValidators) {
             String key = pv.getJSONKey();
@@ -89,5 +98,24 @@ public class CallValidator {
                 parMap.put(key, pv.getDefaultValue());
         }
         return parMap;
+    }
+
+    public String genDoc() {
+
+        StringJoiner sj = new StringJoiner("\n * ");
+
+        for(ParameterValidator pv : parameterValidators) {
+            String type = pv.toString();
+            String paramName = pv.isOptional() ? '[' + pv.getJSONKey() + ']' : pv.getJSONKey();
+            String description = pv.getDescription();
+
+            sj.add("@apiParam {" + type + "} " + paramName + " " + description);
+        }
+
+        return sj.toString();
+    }
+
+    public ParameterValidator[] getParameterValidators() {
+        return parameterValidators;
     }
 }
