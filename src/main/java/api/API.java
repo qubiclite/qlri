@@ -1,7 +1,7 @@
 package api;
 
-import api.resp.general.ResponseAbstract;
-import api.resp.general.ResponseError;
+import resp.general.ResponseAbstract;
+import resp.general.ResponseError;
 import commands.Command;
 import commands.param.CallValidator;
 import io.undertow.Undertow;
@@ -9,16 +9,19 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.util.*;
 import main.Main;
 import main.Persistence;
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.net.InetAddress;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.MappedByteBuffer;
+import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,18 +29,25 @@ import static io.undertow.Handlers.path;
 
 public class API {
 
+    private static final String QLWEB_DOWNLOAD_URL = "https://github.com/qubiclite/qlweb/archive/v"+Main.VERSION+".zip",
+            QLWEB_PATH = "qlweb/qlweb-"+Main.VERSION;
     private static final int MAX_BODY_LENGTH = 10000;
+
     private final Undertow undertowAPI;
     private final Persistence persistence;
 
     public API(Persistence persistence, String host, int port)  throws UnknownHostException {
+
+        if(!new File(QLWEB_PATH).exists())
+            installQLWeb();
 
         this.persistence = persistence;
 
         if(host == null)
             host = InetAddress.getLocalHost().getHostAddress();
 
-        Main.println("starting api listener for '"+host+':'+port+"'");
+        Main.println("starting api listener: '"+host+':'+port+"'");
+        Main.println("qlweb is available on: '"+host+':'+port+"/index.html'");
 
         undertowAPI = Undertow.builder().addHttpListener(port, host).setHandler(path().addPrefixPath("/", new HttpHandlerImplementation(){
             @Override
@@ -83,7 +93,7 @@ public class API {
 
         try {
             exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
-            file = new RandomAccessFile("qlweb"+uri, "r");
+            file = new RandomAccessFile(QLWEB_PATH +uri, "r");
         } catch (FileNotFoundException e) {
             exchange.getResponseSender().send("file not found: " + uri);
             return;
@@ -114,6 +124,7 @@ public class API {
         try {
             obj = new JSONObject(body);
         } catch (JSONException e) {
+            Main.println("failed parsing request to json: " + body);
             return new ResponseError("could not parse request to json object");
         }
 
@@ -146,7 +157,12 @@ public class API {
             return new ResponseError(validationError);
 
         Map<String, Object> parMap = genParMapFromJSON(command.getCallValidator(), request);
-        return command.perform(persistence, parMap);
+
+        try {
+            return command.perform(persistence, parMap);
+        } catch (Throwable t) {
+            return new ResponseError(t);
+        }
     }
 
     private Map<String, Object> genParMapFromJSON(CallValidator cv, JSONObject request) {
@@ -155,5 +171,25 @@ public class API {
             parMap.put(key.toLowerCase().replace(' ', '_'), request.get(key));
         }
         return cv.prepareParMap(parMap);
+    }
+
+    private static void installQLWeb() {
+
+        Main.println("installing qlweb ...");
+        try {
+            URL url = new URL(QLWEB_DOWNLOAD_URL);
+            ReadableByteChannel rbc = Channels.newChannel(url.openStream());
+            FileOutputStream fos = new FileOutputStream("qlweb.zip");
+            fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+
+            ZipFile zipFile = new ZipFile("qlweb.zip");
+            zipFile.extractAll("./qlweb/" );
+            new File("qlweb.zip").delete();
+            Main.println("qlweb installation complete");
+
+        } catch (IOException | ZipException e) {
+            Main.println("qlweb installation failed");
+            e.printStackTrace();
+        }
     }
 }

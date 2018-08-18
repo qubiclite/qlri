@@ -1,6 +1,6 @@
-package api.resp.qubic;
+package resp.qubic;
 
-import api.resp.general.ResponseAbstractList;
+import resp.general.ResponseAbstractList;
 import org.json.JSONArray;
 
 public class ResponseQubicList extends ResponseAbstractList {

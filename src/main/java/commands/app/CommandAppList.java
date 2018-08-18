@@ -1,8 +1,8 @@
 package commands.app;
 
-import api.resp.app.ResponseAppList;
-import api.resp.general.ResponseAbstract;
-import api.resp.general.ResponseSuccess;
+import resp.app.ResponseAppList;
+import resp.general.ResponseAbstract;
+import resp.general.ResponseSuccess;
 import commands.param.CallValidator;
 import commands.param.ParameterValidator;
 import main.App;

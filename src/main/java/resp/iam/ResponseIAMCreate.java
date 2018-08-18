@@ -1,6 +1,6 @@
-package api.resp.iam;
+package resp.iam;
 
-import api.resp.general.ResponseSuccess;
+import resp.general.ResponseSuccess;
 
 public class ResponseIAMCreate extends ResponseSuccess {
 

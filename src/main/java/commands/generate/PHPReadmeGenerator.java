@@ -1,9 +1,9 @@
 package commands.generate;
 
-import resp.general.ResponseAbstract;
-import resp.general.ResponseSuccess;
 import commands.Command;
 import commands.param.ParameterValidator;
+import resp.general.ResponseAbstract;
+import resp.general.ResponseSuccess;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -12,7 +12,7 @@ import java.io.PrintStream;
 import java.util.*;
 
 
-public enum JSReadmeGenerator { ;
+public enum PHPReadmeGenerator { ;
 
     public static void main(String[] args) throws FileNotFoundException {
         new File("../generated.txt").delete();
@@ -45,11 +45,14 @@ public enum JSReadmeGenerator { ;
 
     private static void genParameterTable(Command command, StringJoiner sj) {
         sj.add("#### parameters");
+        if(command.getCallValidator().getParameterValidators().length == 0) {
+            sj.add("no parameters");
+            return;
+        }
         sj.add("| name | type | description |");
         sj.add("| - | - | - |");
-        sj.add("| `callback` | `function` | ");
         for(ParameterValidator pv : command.getCallValidator().getParameterValidators()) {
-            sj.add("| `" + pv.getJSONKey() + "` "+(pv.isOptional() ? " (opt.)" : "")+" | `" + pv.getJSType() + " (" + pv.toString().toLowerCase() + ")` | " + pv.getDescription());
+            sj.add("| `$" + pv.getJSONKey() + "` "+(pv.isOptional() ? " (opt.)" : "")+" | `" + pv.getJSType() + " (" + pv.toString().toLowerCase() + ")` | " + pv.getDescription());
         }
     }
 
@@ -57,19 +60,18 @@ public enum JSReadmeGenerator { ;
         sj.add("#### example call");
 
         StringJoiner parAssignment = new StringJoiner(", ");
-        parAssignment.add("function(resp, err) {\n  if(err) { console.log(err); /* handle error */ }\n  else { /* process response ... */ }\n}");
 
         for(ParameterValidator pv : command.getCallValidator().getParameterValidators())
             parAssignment.add(pv.getJSType().equals("string") ? "'" + pv.getExampleValue()  + "'" : pv.getExampleValue());
 
-        sj.add("```js\nQLITE."+command.getName()+"("+parAssignment+");\n```");
+        sj.add("```php\ntry {\n    $res = $qlite->"+command.getName()+"("+parAssignment+");\n    // process $res ...\n} catch (Exception $exc) {\n    echo $exc; // handle exception\n}\n```");
     }
 
     private static void genSuccessResponseExample(Command command, StringJoiner sj) {
         ResponseAbstract exampleResponse = command.getSuccessResponseExample();
         if(exampleResponse == null)
             exampleResponse = new ResponseSuccess();
-        sj.add("#### example response");
+        sj.add("#### example response (before being parsed into a php array)");
         sj.add("```json\n"+exampleResponse.toJSON().put("duration", 42).toString()+"\n```");
     }
 

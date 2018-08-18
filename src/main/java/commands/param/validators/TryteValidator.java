@@ -47,4 +47,9 @@ public class TryteValidator extends ParameterValidator {
     public String genJSValidation() {
         return "_ParameterValidator.validate_tryte_sequence("+getJSONKey()+", '"+getJSONKey()+"', "+minLength+", "+maxLength+");";
     }
+
+    @Override
+    public String genPHPValidation() {
+        return "$this->validate_tryte_sequence($"+getJSONKey()+", '$"+getJSONKey()+"', "+minLength+", "+maxLength+");";
+    }
 }

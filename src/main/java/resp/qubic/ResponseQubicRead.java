@@ -1,7 +1,7 @@
-package api.resp.qubic;
+package resp.qubic;
 
-import api.resp.general.ResponseAbstract;
-import api.resp.general.ResponseSuccess;
+import resp.general.ResponseAbstract;
+import resp.general.ResponseSuccess;
 import org.json.JSONArray;
 import qubic.QubicReader;
 import qubic.QubicSpecification;

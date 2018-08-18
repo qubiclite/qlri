@@ -1,8 +1,8 @@
 package commands.qubic;
 
-import api.resp.general.ResponseAbstract;
-import api.resp.general.ResponseError;
-import api.resp.general.ResponseSuccess;
+import resp.general.ResponseAbstract;
+import resp.general.ResponseError;
+import resp.general.ResponseSuccess;
 import commands.Command;
 import commands.param.CallValidator;
 import commands.param.ParameterValidator;
@@ -17,12 +17,21 @@ public class CommandQubicDelete extends CommandQubicAbstract {
     public static final CommandQubicDelete instance = new CommandQubicDelete();
 
     private static final CallValidator CV = new CallValidator(new ParameterValidator[]{
-        new TryteValidator(1, 81).setName("qubic handle").setDescription("deletes the qubic that starts with this tryte sequence"),
+            new TryteValidator(81,81).setName("qubic").setDescription("deletes the qubic that starts with this tryte sequence"),
+    });
+
+    private static final CallValidator CV_TERMINAL = new CallValidator(new ParameterValidator[]{
+            new TryteValidator(1, 81).setName("qubic").setDescription("deletes the qubic that starts with this tryte sequence"),
     });
 
     @Override
     public CallValidator getCallValidator() {
         return CV;
+    }
+
+    @Override
+    public CallValidator getCallValidatorForTerminal() {
+        return CV_TERMINAL;
     }
 
     @Override
@@ -47,7 +56,7 @@ public class CommandQubicDelete extends CommandQubicAbstract {
 
     @Override
     public ResponseAbstract perform(Persistence persistence, Map<String, Object> parMap) {
-        String qubicID = (String)parMap.get("qubic_handle");
+        String qubicID = (String)parMap.get("qubic");
         QubicWriter qw = persistence.findQubicWriterByHandle(qubicID);
         if(qw == null)
             return new ResponseError("you do not own a qubic with the id '"+qubicID+"'");

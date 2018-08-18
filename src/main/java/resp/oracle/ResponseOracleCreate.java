@@ -1,6 +1,6 @@
-package api.resp.oracle;
+package resp.oracle;
 
-import api.resp.general.ResponseSuccess;
+import resp.general.ResponseSuccess;
 
 public class ResponseOracleCreate extends ResponseSuccess {
 

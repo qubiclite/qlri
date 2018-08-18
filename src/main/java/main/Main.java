@@ -1,8 +1,8 @@
 package main;
 
 import api.API;
-import api.resp.general.ResponseAbstract;
-import api.resp.general.ResponseError;
+import resp.general.ResponseAbstract;
+import resp.general.ResponseError;
 import commands.Command;
 
 import java.net.UnknownHostException;
@@ -14,7 +14,7 @@ import java.util.Scanner;
 public class Main {
 
     public static final DateFormat DF = new SimpleDateFormat("YYYY/MMM/dd HH:mm:ss");
-    public static final String VERSION = "0.4.0-SNAPSHOT";
+    public static final String VERSION = "0.4.0";
     private static final Scanner s = new Scanner(System.in);
 
     private static Persistence persistence;

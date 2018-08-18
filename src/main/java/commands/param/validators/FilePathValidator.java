@@ -31,4 +31,9 @@ public class FilePathValidator extends ParameterValidator {
     public String genJSValidation() {
         return "_ParameterValidator.validate_string("+getJSONKey()+", '"+getJSONKey()+"');";
     }
+
+    @Override
+    public String genPHPValidation() {
+        return "$this->validate_string($"+getJSONKey()+", '$"+getJSONKey()+"');";
+    }
 }

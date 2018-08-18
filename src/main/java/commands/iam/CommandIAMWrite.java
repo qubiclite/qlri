@@ -1,8 +1,8 @@
 package commands.iam;
 
-import api.resp.general.ResponseAbstract;
-import api.resp.general.ResponseError;
-import api.resp.general.ResponseSuccess;
+import resp.general.ResponseAbstract;
+import resp.general.ResponseError;
+import resp.general.ResponseSuccess;
 import commands.param.CallValidator;
 import commands.param.ParameterValidator;
 import commands.param.validators.*;
@@ -84,7 +84,7 @@ public class CommandIAMWrite extends ComandIAMAbstract {
             }
         }
 
-        ips.get(0).publish(new IAMIndex(index), message);
+        ips.get(0).write(new IAMIndex(index), message);
         return new ResponseSuccess();
     }
 }

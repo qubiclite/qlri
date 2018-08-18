@@ -1,8 +1,8 @@
 package commands.qubic;
 
-import api.resp.general.ResponseAbstract;
-import api.resp.general.ResponseError;
-import api.resp.general.ResponseSuccess;
+import resp.general.ResponseAbstract;
+import resp.general.ResponseError;
+import resp.general.ResponseSuccess;
 import commands.Command;
 import commands.param.CallValidator;
 import commands.param.ParameterValidator;
@@ -19,13 +19,14 @@ public class CommandQubicAssemble extends CommandQubicAbstract {
 
     public static final CommandQubicAssemble instance = new CommandQubicAssemble();
 
-    private static final ParameterValidator  PV_QH = new TryteValidator(1, 81).setName("qubic handle").setDescription("the qubic that shall publish its assembly transaction");
+    private static final ParameterValidator  PV_Q = new TryteValidator(81, 81).setName("qubic").setDescription("the qubic that shall publish its assembly transaction");
+    private static final ParameterValidator  PV_Q_TERMINAL = new TryteValidator(1, 81).setName("qubic").setDescription("the qubic that shall publish its assembly transaction");
 
     private static final CallValidator CV = new CallValidator(new ParameterValidator[]{
-        PV_QH, new JSONArrayValidator().setName("assembly").setExampleValue("['"+TryteTool.generateRandom(81) +"', '"+TryteTool.generateRandom(81)+"']").setDescription("json array of the oracle IDs to be part of the assembly")
+            PV_Q, new JSONArrayValidator().setName("assembly").setExampleValue("['"+TryteTool.generateRandom(81) +"', '"+TryteTool.generateRandom(81)+"']").setDescription("json array of the oracle IDs to be part of the assembly")
     });
 
-    private static final CallValidator CV_TERMINAL = new CallValidator(new ParameterValidator[]{ PV_QH });
+    private static final CallValidator CV_TERMINAL = new CallValidator(new ParameterValidator[]{ PV_Q_TERMINAL });
 
     @Override
     public CallValidator getCallValidatorForTerminal() {
@@ -64,7 +65,7 @@ public class CommandQubicAssemble extends CommandQubicAbstract {
     @Override
     public ResponseAbstract perform(Persistence persistence, Map<String, Object> parMap) {
 
-        String qubicHandle = (String)parMap.get(PV_QH.getJSONKey());
+        String qubicHandle = (String)parMap.get(PV_Q.getJSONKey());
         JSONArray assembly = (JSONArray)parMap.get("assembly");
 
         QubicWriter qw = persistence.findQubicWriterByHandle(qubicHandle);

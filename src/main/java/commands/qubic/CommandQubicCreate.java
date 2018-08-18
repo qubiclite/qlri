@@ -1,15 +1,16 @@
 package commands.qubic;
 
-import api.resp.general.ResponseAbstract;
-import api.resp.general.ResponseError;
-import api.resp.general.ResponseSuccess;
-import api.resp.qubic.ResponseQubicCreate;
+import resp.general.ResponseAbstract;
+import resp.general.ResponseError;
+import resp.general.ResponseSuccess;
+import resp.qubic.ResponseQubicCreate;
 import commands.Command;
 import commands.param.CallValidator;
 import commands.param.ParameterValidator;
 import commands.param.validators.FilePathValidator;
 import commands.param.validators.IntegerValidator;
 import commands.param.validators.StringValidator;
+import main.IAMWriterStock;
 import main.Persistence;
 import qubic.EditableQubicSpecification;
 import qubic.QubicWriter;
@@ -100,7 +101,7 @@ public class CommandQubicCreate extends CommandQubicAbstract {
         if (executionStart < currentTimeMillis)
             executionStart += currentTimeMillis;
 
-        QubicWriter qw = new QubicWriter();
+        QubicWriter qw = new QubicWriter(IAMWriterStock.receive());
 
         EditableQubicSpecification eqs = qw.getEditable();
         eqs.setExecutionStartUnix(executionStart);

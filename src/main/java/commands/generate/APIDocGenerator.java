@@ -1,6 +1,6 @@
 package commands.generate;
 
-import api.resp.general.ResponseSuccess;
+import resp.general.ResponseSuccess;
 import commands.Command;
 import main.Main;
 

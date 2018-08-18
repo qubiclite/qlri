@@ -1,6 +1,6 @@
-package api.resp.qubic;
+package resp.qubic;
 
-import api.resp.general.ResponseSuccess;
+import resp.general.ResponseSuccess;
 
 public class ResponseQubicQuickRun extends ResponseSuccess {
 

@@ -37,6 +37,8 @@ public abstract class ParameterValidator {
 
     public String genJSValidation() {return null;}
 
+    public String genPHPValidation() {return null;}
+
     public String getJSType() {
         return "string";
     }

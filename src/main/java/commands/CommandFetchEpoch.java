@@ -1,8 +1,8 @@
 package commands;
 
-import api.resp.ResponseFetchEpoch;
-import api.resp.general.ResponseAbstract;
-import api.resp.general.ResponseSuccess;
+import resp.ResponseFetchEpoch;
+import resp.general.ResponseAbstract;
+import resp.general.ResponseSuccess;
 import commands.param.CallValidator;
 import commands.param.ParameterValidator;
 import commands.param.validators.IntegerValidator;
@@ -23,7 +23,7 @@ public class CommandFetchEpoch extends Command {
 
     private static ParameterValidator PV_QUBIC = new TryteValidator(81, 81).setName("qubic").setExampleValue(TryteTool.generateRandom(81)).setDescription("qubic to fetch from"),
             PV_EPOCH = new IntegerValidator(0, Integer.MAX_VALUE).setName("epoch").setExampleValue("4").setDescription("epoch to fetch"),
-            PV_EPOCH_MAX = new IntegerValidator(0, Integer.MAX_VALUE).setName("epoch max").setExampleValue("7").setDescription("if used will fetch all epochs from '"+PV_EPOCH.getName()+"' up to this value").makeOptional(-1);
+            PV_EPOCH_MAX = new IntegerValidator(-1, Integer.MAX_VALUE).setName("epoch max").setExampleValue("7").setDescription("if used will fetch all epochs from '"+PV_EPOCH.getName()+"' up to this value").makeOptional(-1);
 
     private static final CallValidator CV = new CallValidator(new ParameterValidator[]{ PV_QUBIC, PV_EPOCH, PV_EPOCH_MAX });
 

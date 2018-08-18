@@ -1,9 +1,8 @@
 package commands.qubic;
 
-import api.resp.general.ResponseAbstract;
-import api.resp.general.ResponseSuccess;
-import api.resp.qubic.ResponseQubicList;
-import commands.Command;
+import resp.general.ResponseAbstract;
+import resp.general.ResponseSuccess;
+import resp.qubic.ResponseQubicList;
 import commands.param.CallValidator;
 import commands.param.ParameterValidator;
 import commands.param.validators.TryteValidator;
@@ -11,9 +10,7 @@ import main.Persistence;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import qubic.QubicWriter;
-import tangle.TryteTool;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -71,22 +68,28 @@ public class CommandQubicList extends CommandQubicAbstract {
         String filter = (String)parMap.get("filter");
         List<QubicWriter> qws = persistence.findAllQubicWritersWithHandle(filter != null ? filter : "");
         JSONArray arr = new JSONArray();
-
-        for(QubicWriter qw : qws) {
-            JSONObject oracleObject = new JSONObject();
-            oracleObject.put("id", qw.getID());
-            oracleObject.put("state", qw.getState());
-            arr.put(oracleObject);
-        }
-
+        for(QubicWriter qw : qws)
+            arr.put(generateListEntry(qw));
         return new ResponseQubicList(arr);
+    }
+
+    private JSONObject generateListEntry(QubicWriter qubicWriter) {
+        JSONObject listEntry = new JSONObject();
+        listEntry.put("id", qubicWriter.getID());
+        listEntry.put("state", qubicWriter.getState());
+        listEntry.put("specification", qubicWriter.getSpecification().generateQubicTransactionJSON());
+        return listEntry;
     }
 
     @Override
     public ResponseSuccess getSuccessResponseExample() {
         JSONArray arr = new JSONArray();
-        arr.put(TryteTool.generateRandom(81));
-        arr.put(TryteTool.generateRandom(81));
+
+        QubicWriter qw = new QubicWriter();
+        qw.getEditable().setCode("return('hello world');");
+        qw.publishQubicTransaction();
+
+        arr.put(generateListEntry(qw));
         return new ResponseQubicList(arr);
     }
 }

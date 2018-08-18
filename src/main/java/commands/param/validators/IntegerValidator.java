@@ -42,6 +42,11 @@ public class IntegerValidator extends ParameterValidator {
     }
 
     @Override
+    public String genPHPValidation() {
+        return "$"+getJSONKey()+" = (int)$"+getJSONKey()+"; $this->validate_integer($"+getJSONKey()+", '$"+getJSONKey()+"', "+min+", "+max+");";
+    }
+
+    @Override
     public String getJSType() {
         return "int";
     }

@@ -1,9 +1,9 @@
 package commands.qubic;
 
-import api.resp.general.ResponseAbstract;
-import api.resp.general.ResponseError;
-import api.resp.general.ResponseSuccess;
-import api.resp.qubic.ResponseQubicRead;
+import resp.general.ResponseAbstract;
+import resp.general.ResponseError;
+import resp.general.ResponseSuccess;
+import resp.qubic.ResponseQubicRead;
 import commands.Command;
 import commands.param.CallValidator;
 import commands.param.ParameterValidator;
@@ -56,7 +56,6 @@ public class CommandQubicRead extends CommandQubicAbstract {
 
         println("ID:                   " + r.getID());
         println("version:              " + r.getVersion());
-        println("application address:  " + r.getApplicationAddress());
         println("epoch duration:       " + epochDuration + "s (" + r.getHashPeriodDuration() + "s + " + r.getResultPeriodDuration() + "s)");
         println("execution start:      " + Main.DF.format(1000L * r.getExecutionStart()) + " (" + r.getExecutionStart() + ", "+(r.getExecutionStart()-System.currentTimeMillis()/1000)+"s)");
 
@@ -66,7 +65,7 @@ public class CommandQubicRead extends CommandQubicAbstract {
 
         println("");
         println("code:");
-        println("    " + r.getCode());
+        println("    " + r.getCode().replace("\n", "\n    "));
         println("");
         JSONArray assemblyList = r.getAssemblyList();
         if(assemblyList != null) {
@@ -95,7 +94,7 @@ public class CommandQubicRead extends CommandQubicAbstract {
         QubicReader qr;
 
         try {
-            qr = new QubicReader("GAPGBVIBDKTGZ9BVLCZYWPZAFMIXBDLCUTXOC9NEJ9HGDKZYGRPQVIHMZXRXCDLZIFXGECZBFSTTNA999");
+            qr = new QubicReader("OPVUHLMORYBPOJDCYKLZOXCPKMQUQPRLWUEJZAOVKAWHZIVKG9IBADMAPHNNMIICKRN9YAGMEBNYJC999");
         } catch (Exception e) {
             QubicWriter writer = new QubicWriter();
             writer.getEditable().setCode("return(epoch^2);");

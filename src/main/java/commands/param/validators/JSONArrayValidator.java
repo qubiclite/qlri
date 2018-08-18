@@ -32,6 +32,11 @@ public class JSONArrayValidator extends ParameterValidator {
     }
 
     @Override
+    public String genPHPValidation() {
+        return "$this->validate_array($"+getJSONKey()+", '$"+getJSONKey()+"');";
+    }
+
+    @Override
     public String getJSType() {
         return "array";
     }

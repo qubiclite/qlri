@@ -28,4 +28,9 @@ public class AlphaNumericValidator extends ParameterValidator {
     public String genJSValidation() {
         return "_ParameterValidator.validate_alphanumeric("+getJSONKey()+", '"+getJSONKey()+"');";
     }
+
+    @Override
+    public String genPHPValidation() {
+        return "$this->validate_alphanumeric($"+getJSONKey()+", '$"+getJSONKey()+"');";
+    }
 }

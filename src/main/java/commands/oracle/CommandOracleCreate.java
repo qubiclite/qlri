@@ -1,14 +1,15 @@
 package commands.oracle;
 
-import api.resp.general.ResponseAbstract;
-import api.resp.general.ResponseError;
-import api.resp.general.ResponseSuccess;
-import api.resp.oracle.ResponseOracleCreate;
+import resp.general.ResponseAbstract;
+import resp.general.ResponseError;
+import resp.general.ResponseSuccess;
+import resp.oracle.ResponseOracleCreate;
 import commands.Command;
 import commands.param.CallValidator;
 import commands.param.ParameterValidator;
 import commands.param.validators.TryteValidator;
 import exceptions.InvalidQubicTransactionException;
+import main.IAMWriterStock;
 import main.Persistence;
 import oracle.OracleManager;
 import oracle.OracleWriter;
@@ -61,7 +62,7 @@ public class CommandOracleCreate extends CommandOracleAbstract {
             return new ResponseError(e);
         }
 
-        OracleWriter ow = new OracleWriter(qr);
+        OracleWriter ow = new OracleWriter(qr, IAMWriterStock.receive());
         OracleManager om = new OracleManager(ow);
         persistence.addOracleWriter(ow);
         om.start();

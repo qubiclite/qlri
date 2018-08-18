@@ -3,6 +3,7 @@ package api;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HttpString;
+import main.Main;
 import org.apache.commons.io.IOUtils;
 import sun.nio.ch.ChannelInputStream;
 
@@ -11,7 +12,7 @@ import java.nio.charset.StandardCharsets;
 public abstract class HttpHandlerImplementation implements HttpHandler {
 
     @Override
-    public void handleRequest(final HttpServerExchange exchange) throws Exception {
+    public void handleRequest(final HttpServerExchange exchange) {
 
         // TODO credentials
 
@@ -23,11 +24,14 @@ public abstract class HttpHandlerImplementation implements HttpHandler {
             return;
         }
 
-        ChannelInputStream channelInputStream = new ChannelInputStream(exchange.getRequestChannel());
-        String request = IOUtils.toString(channelInputStream, StandardCharsets.UTF_8);
-
-        processRequest(exchange, request);
-
+        exchange.getRequestReceiver().receiveFullBytes((exchange2, data) -> {
+                String request = new String(data);
+                processRequest(exchange, request);
+            }, (exchange2, exception) -> {
+                Main.println("api failed reading request body");
+                exception.printStackTrace();
+            }
+        );
     }
 
     abstract void processRequest(HttpServerExchange exchange, String request);

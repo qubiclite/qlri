@@ -1,6 +1,6 @@
-package api.resp;
+package resp;
 
-import api.resp.general.ResponseSuccess;
+import resp.general.ResponseSuccess;
 import org.json.JSONArray;
 
 public class ResponseFetchEpoch extends ResponseSuccess {

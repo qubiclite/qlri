@@ -1,8 +1,8 @@
 package commands.oracle;
 
-import api.resp.general.ResponseAbstract;
-import api.resp.general.ResponseError;
-import api.resp.general.ResponseSuccess;
+import resp.general.ResponseAbstract;
+import resp.general.ResponseError;
+import resp.general.ResponseSuccess;
 import commands.Command;
 import commands.param.CallValidator;
 import commands.param.ParameterValidator;

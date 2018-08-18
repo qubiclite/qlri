@@ -1,7 +1,7 @@
 package commands.qubic;
 
-import api.resp.general.ResponseAbstract;
-import api.resp.general.ResponseSuccess;
+import resp.general.ResponseAbstract;
+import resp.general.ResponseSuccess;
 import commands.Command;
 import commands.param.CallValidator;
 import commands.param.ParameterValidator;

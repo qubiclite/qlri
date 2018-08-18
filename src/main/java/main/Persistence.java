@@ -14,7 +14,7 @@ import java.util.*;
 
 public class Persistence {
 
-    public static final String APP_DIR_PATH = "qlweb/qapps";
+    public static final String APP_DIR_PATH = "qlweb/qlweb-"+Main.VERSION+"/qapps";
     private static final String PERSISTENCE_DIR_PATH = "persistence";
     private final String persistenceFileName;
 
@@ -34,11 +34,13 @@ public class Persistence {
     }
 
     public void addOracleWriter(OracleWriter ow) {
+        if(ow.getManager() == null)
+            new OracleManager(ow);
         oracleWriters.put(ow.getID(), ow);
         store();
     }
 
-    public void addIAMPublisher(IAMWriter ip) {
+    public void addIAMWriter(IAMWriter ip) {
         iamPublishers.put(ip.getID(), ip);
         store();
     }
@@ -122,7 +124,7 @@ public class Persistence {
                 Main.println("   > " + ip.getID());
             return null;
         } else if(ips.size() == 0) {
-            Main.println("no IAM streams found");
+            Main.println("no IAM streams with handle '"+handle+"' found");
             return null;
         } else {
             return ips.get(0);
@@ -144,7 +146,7 @@ public class Persistence {
                 Main.println("   > " + ow.getID());
             return null;
         } else if(ows.size() == 0) {
-            Main.println("no oracles found");
+            Main.println("no oracles with handle '"+handle+"' found");
             return null;
         } else {
             return ows.get(0);
@@ -166,7 +168,7 @@ public class Persistence {
                 Main.println("   > " + qw.getID());
             return null;
         } else if(qws.size() == 0) {
-            Main.println("no qubics found");
+            Main.println("no qubics with handle '"+handle+"' found");
             return null;
         } else {
             return qws.get(0);
@@ -210,7 +212,7 @@ public class Persistence {
         for(QubicWriter qw : qubicWriters.values()) {
             JSONObject qwObj = new JSONObject();
             qwObj.put("id", qw.getID());
-            qwObj.put("private_key", qw.getWriter().getPrivateKeyTrytes());
+            qwObj.put("private_key", qw.getIAMWriter().getPrivateKeyTrytes());
             qwArr.put(qwObj);
         }
 

@@ -1,6 +1,6 @@
-package api.resp.iam;
+package resp.iam;
 
-import api.resp.general.ResponseAbstractList;
+import resp.general.ResponseAbstractList;
 import org.json.JSONArray;
 
 public class ResponseIAMList extends ResponseAbstractList {

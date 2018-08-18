@@ -1,8 +1,8 @@
 package commands;
 
-import api.resp.general.ResponseAbstract;
-import api.resp.general.ResponseError;
-import api.resp.general.ResponseSuccess;
+import resp.general.ResponseAbstract;
+import resp.general.ResponseError;
+import resp.general.ResponseSuccess;
 import commands.app.CommandAppInstall;
 import commands.app.CommandAppList;
 import commands.app.CommandAppUninstall;
@@ -28,6 +28,8 @@ public abstract class Command {
             CommandHelp.instance,
             CommandChangeNode.instance,
             CommandFetchEpoch.instance,
+            CommandExport.instance,
+            CommandImport.instance,
 
             CommandQubicRead.instance,
             CommandQubicList.instance,
@@ -38,6 +40,7 @@ public abstract class Command {
             CommandQubicAssemble.instance,
             CommandQubicTest.instance,
             CommandQubicQuickRun.instance,
+            CommandQubicConsensus.instance,
 
             CommandOracleCreate.instance,
             CommandOracleDelete.instance,

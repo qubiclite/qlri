@@ -1,4 +1,4 @@
-package api.resp.general;
+package resp.general;
 
 import org.json.JSONArray;
 

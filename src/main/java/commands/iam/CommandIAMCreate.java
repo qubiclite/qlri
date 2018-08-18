@@ -1,11 +1,12 @@
 package commands.iam;
 
-import api.resp.general.ResponseAbstract;
-import api.resp.general.ResponseSuccess;
-import api.resp.iam.ResponseIAMCreate;
+import resp.general.ResponseAbstract;
+import resp.general.ResponseSuccess;
+import resp.iam.ResponseIAMCreate;
 import commands.param.CallValidator;
 import commands.param.ParameterValidator;
 import iam.IAMWriter;
+import main.IAMWriterStock;
 import main.Persistence;
 import tangle.TryteTool;
 
@@ -46,8 +47,8 @@ public class CommandIAMCreate extends ComandIAMAbstract {
 
     @Override
     public ResponseAbstract perform(Persistence persistence, Map<String, Object> parMap) {
-        IAMWriter iamWriter = new IAMWriter();
-        persistence.addIAMPublisher(iamWriter);
+        IAMWriter iamWriter = IAMWriterStock.receive();
+        persistence.addIAMWriter(iamWriter);
         return new ResponseIAMCreate(iamWriter.getID());
     }
 

@@ -1,9 +1,9 @@
 package commands.iam;
 
-import api.resp.general.ResponseAbstract;
-import api.resp.general.ResponseSuccess;
-import api.resp.iam.ResponseIAMList;
-import api.resp.iam.ResponseIAMRead;
+import resp.general.ResponseAbstract;
+import resp.general.ResponseSuccess;
+import resp.iam.ResponseIAMList;
+import resp.iam.ResponseIAMRead;
 import commands.Command;
 import commands.param.CallValidator;
 import commands.param.ParameterValidator;

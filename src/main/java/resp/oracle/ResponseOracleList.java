@@ -1,6 +1,6 @@
-package api.resp.oracle;
+package resp.oracle;
 
-import api.resp.general.ResponseAbstractList;
+import resp.general.ResponseAbstractList;
 import org.json.JSONArray;
 
 public class ResponseOracleList extends ResponseAbstractList {
