@@ -19,4 +19,4 @@ RUN mvn versions:use-latest-versions -DallowSnapshots=true -DexcludeReactor=fals
 
 RUN mvn install
 
-CMD java -jar qlri-0.3.jar -api
+CMD java -jar qlri-0.4.1.jar -api
