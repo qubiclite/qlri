@@ -47,7 +47,20 @@ mvn install
 ```
 
 If everything went successfully, you should now find a runnable jar file called `qlri-[VERSION].jar` in the `qlri/` directory.
-    
+
+## Build and run with docker
+
+Build a docker image with "qubiclite/qlri:latest" tag
+``` shell
+docker build -t qubiclite/qlri:latest .  
+```
+
+Run the docker image
+``` shell
+docker run -it -p 17733:17733  qubiclite/qlri
+```
+Open http://localhost:17733/ in your browser.
+
 ## Running The Jar File
 
 ### Default Start
