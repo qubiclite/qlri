@@ -6,7 +6,7 @@
 
     <groupId>com.qubiota</groupId>
     <artifactId>qlri</artifactId>
-    <version>0.3</version>
+    <version>0.4.1</version>
 
 
     <properties>
@@ -22,7 +22,7 @@
         <dependency>
             <groupId>org.qubiclite</groupId>
             <artifactId>qlite</artifactId>
-            <version>0.3</version>
+            <version>0.4.1</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

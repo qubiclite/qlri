@@ -1,5 +1,6 @@
 package main;
 
+import api.API;
 import iam.IAMWriter;
 import oracle.OracleManager;
 import oracle.OracleWriter;
@@ -14,7 +15,7 @@ import java.util.*;
 
 public class Persistence {
 
-    public static final String APP_DIR_PATH = "qlweb/qlweb-"+Main.VERSION+"/qapps";
+    public static final String APP_DIR_PATH = API.QLWEB_PATH + "/qapps";
     private static final String PERSISTENCE_DIR_PATH = "persistence";
     private final String persistenceFileName;
 

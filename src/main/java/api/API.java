@@ -29,8 +29,9 @@ import static io.undertow.Handlers.path;
 
 public class API {
 
-    private static final String QLWEB_DOWNLOAD_URL = "https://github.com/qubiclite/qlweb/archive/v"+Main.VERSION+".zip",
-            QLWEB_PATH = "qlweb/qlweb-"+Main.VERSION;
+    private static final String QLWEB_VERSION = "0.4.1";
+    private static final String QLWEB_DOWNLOAD_URL = "https://github.com/qubiclite/qlweb/archive/v"+QLWEB_VERSION+".zip";
+    public static final String QLWEB_PATH = "qlweb/qlweb-"+QLWEB_VERSION;
     private static final int MAX_BODY_LENGTH = 10000;
 
     private final Undertow undertowAPI;
@@ -114,7 +115,10 @@ public class API {
 
         // TODO validate version
         if (!exchange.getRequestHeaders().contains("X-QLITE-API-Version"))
-            return new ResponseError("no api version declared in request");
+            return new ResponseError("no api version declared in request (use header: X-QLITE-API-Version)");
+
+        if (!exchange.getRequestHeaders().getFirst("X-QLITE-API-Version").equals(Main.VERSION))
+            return new ResponseError("api version does not match ql-node version (expected 'X-QLITE-API-Version: "+Main.VERSION+"')");
 
         if (body.length() > MAX_BODY_LENGTH)
             return new ResponseError("request exceeds max length of "+MAX_BODY_LENGTH+" characters");

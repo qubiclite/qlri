@@ -14,7 +14,7 @@ import java.util.Scanner;
 public class Main {
 
     public static final DateFormat DF = new SimpleDateFormat("YYYY/MMM/dd HH:mm:ss");
-    public static final String VERSION = "0.4.0";
+    public static final String VERSION = "0.4.1";
     private static final Scanner s = new Scanner(System.in);
 
     private static Persistence persistence;
