@@ -124,35 +124,35 @@ For specific information to a command (parameter details + example use), use `he
 
 | command | alias | what it does |
 | --- | --- | ---
-| `help`                    | `?`   | helps the user by listing all available commands and providing details to any specific command
-| `change_node`             | `cn`  | changes the node used to connect to and interact with the tangle
-| `fetch_epoch`             | `fe`  | determines the quorum based result (which can be considered the consensus) of any qubic at any epoch
-| | |
-| `qubic_read`              | `qr`  | reads the metadata of any qubic, thus allows the user to analyze that qubic
-| `qubic_list`              | `ql`  | prints the full list of all qubics stored in the persistence
-| `qubic_create`            | `qc`  | creates a new qubic and stores it in the persistence. life cycle will not be automized: do the assembly transaction manually
-| `qubic_delete`            | `qd`  | removes a qubic from the persistence (qubic's private key will be deleted: cannot be undone)
-| `qubic_list_applications` | `qla` | lists all incoming oracle applications for a specific qubic, basis for 'qubic_assembly_add'
-| `qubic_assembly_add`      | `qaa` | adds an oracle to the assembly as preparation for 'qubic_assemble'
-| `qubic_assemble`          | `qa`  | publishes the assembly transaction for a specific qubic
-| `qubic_test`              | `qt`  | runs ql code locally (instead of over the tangle) to allow the author to quickly test whether it works as intended
-| `qubic_quick_run`         | `qqr` | runs a minimalistic qubic (will not be added to the persistence), automates the full qubic life cycle to allow the author to quickly test whether the code works as intended. only one oracle will be added to the assembly.
-| | |
-| `oracle_create`           | `oc`  | creates a new oracle and stores it in the persistence. life cycle will be automized, no need to do anything from here on
-| `oracle_delete`           | `od`  | removes an oracle from the persistence (oracle's private key will be deleted: cannot be undone)
-| `oracle_list`             | `ol`  | prints the full list of all oracles stored in the persistence
-| `oracle_pause`            | `op`  | temporarily stops an oracle from processing its qubic, can be undone with 'oracle_restart'
-| `oracle_restart`          | `or`  | restarts an oracle that was paused with 'oracle_pause', makes it process its qubic again
-| | |
-| `iam_create`              | `ic`  | creates a new IAM stream and stores it in the persistence
-| `iam_delete`              | `id`  | removes an IAM stream from the persistence (stream's private key will be deleted: cannot be undone)
-| `iam_list`                | `il`  | prints the full list of all IAM streams stored in the persistence
-| `iam_write`               | `iw`  | writes a message into the iam stream to a certain index
-| `iam_read`                | `ir`  | reads the message of an IAM stream at a certain index
-| | |
-| `apps_list`               | `al`  | prints the full list of all app installed
-| `app_install`             | `ai`  | installs an app from an external source
-| `app_uninstall`           | `au`  | uninstalls an app
+| `help`                    | `?`   | Helps the user by listing all available commands and providing details to any specific command.
+| `change_node`             | `cn`  | Changes the IOTA full node used to interact with the tangle.
+| `fetch_epoch`             | `fe`  | Determines the quorum based result (consensus) of a qubic's epoch.
+| `export`                  | `ex`  | Transforms an entity (iam stream, qubic or oracle) into a string that can be imported again.
+| `import`                  | `im`  | Imports a once exported entity (iam stream, qubic or oracle) encoded by a string.
+| `qubic_read`              | `qr`  | Reads the specification of any qubic, thus allows the user to analyze that qubic.
+| `qubic_list`              | `ql`  | Lists all qubics stored in the persistence.
+| `qubic_create`            | `qc`  | Creates a new qubic and stores it in the persistence. life cycle will not be automized: do the assembly transaction manually.
+| `qubic_delete`            | `qd`  | Removes a qubic from the persistence (private key will be deleted: cannot be undone).
+| `qubic_list_applications` | `qla` | Lists all incoming oracle applications for a specific qubic, response can be used for 'qubic_assembly_add'.
+| `qubic_assembly_add`      | `qaa` | Adds an oracle to the assembly as preparation for 'qubic_assemble'.
+| `qubic_assemble`          | `qa`  | Publishes the assembly transaction for a specific qubic.
+| `qubic_test`              | `qt`  | Runs QL code locally (instead of over the tangle) to allow the author to quickly test whether it works as intended. Limited Functionality (e.g. no qubic_fetch).
+| `qubic_quick_run`         | `qqr` | Runs a minimalistic qubic, automates the full qubic life cycle to allow the author to quickly test whether the code works as intended. Only one oracle will be added to the assembly.
+| `qubic_consensus`         | `qco` | Determines the quorum based consensus of a qubic's oracle assembly at any IAM index.
+| `oracle_create`           | `oc`  | Creates a new oracle and stores it in the persistence. Life cycle will run automically, no more actions required from here on.
+| `oracle_delete`           | `od`  | Removes an oracle from the persistence (private key will be deleted, cannot be undone).
+| `oracle_list`             | `ol`  | Lists all oracles stored in the persistence
+| `oracle_pause`            | `op`  | Temporarily stops an oracle from processing its qubic after the epoch finishes. Can be undone with 'oracle_restart'.
+| `oracle_restart`          | `or`  | Restarts an oracle that was paused with 'oracle_pause', makes it process its qubic again.
+| `iam_create`              | `ic`  | Creates a new IAM stream and stores it locally in the persistence.
+| `iam_delete`              | `id`  | Removes an IAM stream from the persistence (private key will be deleted, cannot be undone).
+| `iam_list`                | `il`  | List all IAM streams stored in the persistence.
+| `iam_write`               | `iw`  | Writes a message into the iam stream at an index position.
+| `iam_read`                | `ir`  | Reads the message of an IAM stream at a certain index.
+| `app_list`                | `al`  | Lists all apps installed.
+| `app_install`             | `ai`  | Installs an app from an external source.
+| `app_uninstall`           | `au`  | Uninstalls an app.
+
 
 ## Screenshots
 
