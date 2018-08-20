@@ -40,7 +40,7 @@ public class CommandExport extends Command {
 
     @Override
     public String getDescription() {
-        return "transforms an entity (iam stream, qubic or oracle) into a string that can be imported again";
+        return "Transforms an entity (iam stream, qubic or oracle) into a string that can be imported again.";
     }
 
     @Override

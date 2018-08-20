@@ -61,9 +61,9 @@ public class CommandQubicConsensus extends Command {
         double quorumMax = qbr.getQuorumMax();
         double percentage = Math.round(1000 * quorum / quorumMax) / 10;
 
-        println("INDEX:  " + ( iamIndex.getKeyword().length() > 0 ? iamIndex.getKeyword() + " : " : "") + iamIndex.getPosition());
+        println("INDEX:  " + (iamIndex.getKeyword().length() > 0 ? iamIndex.getKeyword() + " : " : "") + iamIndex.getPosition());
         println("RESULT: " + qbr.getResult());
-        println("QUORUM: " + quorum + " / " + quorumMax + " ("+(percentage)+"%)");
+        println("QUORUM: " + quorum + " / " + quorumMax + " ("+percentage+"%)");
     }
 
     @Override

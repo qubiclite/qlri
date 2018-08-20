@@ -42,7 +42,7 @@ public class CommandImport extends Command {
 
     @Override
     public String getDescription() {
-        return "imports a once exported entity (iam stream, qubic or oracle) encoded by a string";
+        return "Imports a once exported entity (iam stream, qubic or oracle) encoded by a string.";
     }
 
     @Override

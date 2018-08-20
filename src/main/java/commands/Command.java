@@ -26,6 +26,7 @@ public abstract class Command {
     public static final Command[] COMMANDS = {
 
             CommandHelp.instance,
+            CommandNodeInfo.instance,
             CommandChangeNode.instance,
             CommandFetchEpoch.instance,
             CommandExport.instance,
