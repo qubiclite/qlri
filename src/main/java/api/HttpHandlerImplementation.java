@@ -19,10 +19,7 @@ public class HttpHandlerImplementation implements HttpHandler {
     @Override
     public void handleRequest(final HttpServerExchange exchange) {
 
-        // TODO credentials
-
-        exchange.getResponseHeaders().put(new HttpString("Access-Control-Allow-Origin"), "*");
-        exchange.getResponseHeaders().put(new HttpString("Access-Control-Allow-Headers"), "Origin, X-Requested-With, Content-Type, Accept, X-QLITE-API-Version");
+        putResponseHeaders(exchange);
 
         if (exchange.isInIoThread()) {
             exchange.dispatch(this);
@@ -30,8 +27,8 @@ public class HttpHandlerImplementation implements HttpHandler {
         }
 
         exchange.getRequestReceiver().receiveFullBytes((exchange2, data) -> {
-                String request = new String(data);
-                processRequest(exchange, request);
+                String body = new String(data);
+                processRequest(exchange, body);
             }, (exchange2, exception) -> {
                 Main.println("api failed reading request body");
                 exception.printStackTrace();
@@ -39,17 +36,21 @@ public class HttpHandlerImplementation implements HttpHandler {
         );
     }
 
+    private void putResponseHeaders(HttpServerExchange exchange) {
+        exchange.getResponseHeaders().put(new HttpString("Access-Control-Allow-Origin"), "*");
+        exchange.getResponseHeaders().put(new HttpString("Access-Control-Allow-Headers"), "Origin, X-Requested-With, Content-Type, Accept, X-QLITE-API-Version");
+    }
 
-    void processRequest(HttpServerExchange exchange, String request) {
+    private void processRequest(HttpServerExchange exchange, String body) {
         if(exchange.getRequestURI().replace("/", "").length() > 0)
             try {
-                api.sendFile(exchange);
+                API.sendFile(exchange);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         else {
             long timeStarted = System.currentTimeMillis();
-            ResponseAbstract response = api.processRawRequest(request, exchange);
+            ResponseAbstract response = RequestProcessor.process(api.getPersistence(), body, exchange);
             String responseString = response.toJSON().put("duration", System.currentTimeMillis()-timeStarted).toString();
             exchange.getResponseSender().send(responseString);
         }

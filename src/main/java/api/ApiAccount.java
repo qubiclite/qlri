@@ -3,10 +3,12 @@ package api;
 import io.undertow.security.idm.Account;
 
 import java.security.Principal;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 public class ApiAccount implements Account {
+
+    private Set<String> roles = new HashSet<>();
 
     private final Principal principal;
     private final char[] password;
@@ -28,10 +30,14 @@ public class ApiAccount implements Account {
 
     @Override
     public Set<String> getRoles() {
-        return Collections.emptySet();
+        return roles;
     }
 
-    public char[] getPassword() {
+    void addRole(String role) {
+        roles.add(role);
+    }
+
+    char[] getPassword() {
         return password;
     }
 }

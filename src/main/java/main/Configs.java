@@ -1,6 +1,7 @@
 package main;
 
 import api.ApiAccount;
+import api.PrivilegedApiAccount;
 import commands.param.validators.NodeAddressValidator;
 import tangle.TangleAPI;
 
@@ -100,7 +101,7 @@ public class Configs {
             throw new InvalidParameterException("could not add user: expected 'user:pass', actual '"+argValue+"'");
         String username = argValue.split(":", -1)[0];
         String password = argValue.split(":", -1)[1];
-        accounts.add(new ApiAccount(username, password));
+        accounts.add(new PrivilegedApiAccount(username, password));
     }
 
     public int getPort() {
