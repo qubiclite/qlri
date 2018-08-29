@@ -93,6 +93,7 @@ You can pass certain paramters with that line
 | `-api` | | `-api` | disabled | enables the api and web gui (address will be shown in your terminal)
 | `-port` | `-p` | `-port 17733` | 17733 | sets the port of the api (requires api to be enabled)
 | `-host` | `-h` | `-host localhost` | your ip | sets a custom host for your api instead of the ip (make sure that the host is available!)
+| `-user` | `-u` | `-u tom:hunter2` | no user | adds a user account to the API (public access if no account set)
 | `-mainnet` | `-mn` | `-mainnet` | testnet | required when you want to connect through mainnet nodes to the mainnet tangle instead of testnet
 | `-node` | `-n` | `-n http://no.de:443` | IF testnet² | changes the iota node that is used to connect to the tangle
 | `-remotepow` | `-rp` | `-remotepow` | disabled | outsources the proof-of-work from your qlri to the remote iota node (requires that node to have remote pow activated)

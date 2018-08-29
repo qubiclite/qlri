@@ -85,6 +85,7 @@ public class Configs {
                 localPowEnabled = false;
                 break;
             case "-u":
+            case "-user":
                 addAccount(argValue);
                 break;
             default:
