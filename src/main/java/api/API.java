@@ -1,5 +1,9 @@
 package api;
 
+import io.undertow.security.handlers.SecurityInitialHandler;
+import io.undertow.security.idm.IdentityManager;
+import io.undertow.server.HttpHandler;
+import main.Configs;
 import resp.general.ResponseAbstract;
 import resp.general.ResponseError;
 import commands.Command;
@@ -23,6 +27,8 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import static io.undertow.Handlers.path;
@@ -34,7 +40,6 @@ public class API {
     public static final String QLWEB_PATH = "qlweb/qlweb-"+QLWEB_VERSION;
     private static final int MAX_BODY_LENGTH = 10000;
 
-    private final Undertow undertowAPI;
     private final Persistence persistence;
 
     public API(Persistence persistence, String host, int port)  throws UnknownHostException {
@@ -47,36 +52,30 @@ public class API {
         if(host == null)
             host = InetAddress.getLocalHost().getHostAddress();
 
-        Main.println("starting api listener: '"+host+':'+port+"'");
-        Main.println("qlweb is available on: '"+host+':'+port+"/index.html'");
-
-        undertowAPI = Undertow.builder().addHttpListener(port, host).setHandler(path().addPrefixPath("/", new HttpHandlerImplementation(){
-            @Override
-            void processRequest(HttpServerExchange exchange, String request) {
-                if(exchange.getRequestURI().replace("/", "").length() > 0)
-                    try {
-                        sendFile(exchange);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                else {
-                    long timeStarted = System.currentTimeMillis();
-                    ResponseAbstract response = processRawRequest(request, exchange);
-                    String responseString = response.toJSON().put("duration", System.currentTimeMillis()-timeStarted).toString();
-                    exchange.getResponseSender().send(responseString);
-                }
-            }
-        })).build();
-
         try {
-            undertowAPI.start();
+            buildUndertow(host, port).start();
+            Main.println("starting api listener: '"+host+':'+port+"'");
+            Main.println("qlweb is available on: '"+host+':'+port+"/index.html'");
         } catch (RuntimeException e) {
             Main.err("starting api failed" + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private static void sendFile(HttpServerExchange exchange) throws IOException {
+    private Undertow buildUndertow(String host, int port) {
+        HttpHandler httpHandler = createHttpHandler();
+        return Undertow.builder()
+                .addHttpListener(port, host)
+                .setHandler(path().addPrefixPath("/", httpHandler)).build();
+    }
+
+    private HttpHandler createHttpHandler() {
+        HttpHandler httpHandler = new HttpHandlerImplementation(this);
+        MapIdentityManager identityManager = new MapIdentityManager(Configs.getInstance().getAccounts());
+        return SecurityInitialHandlerFactory.create(httpHandler, identityManager);
+    }
+
+    static void sendFile(HttpServerExchange exchange) throws IOException {
 
         String uri = exchange.getRequestURI();
 
@@ -109,7 +108,7 @@ public class API {
         file.close();
     }
 
-    private ResponseAbstract processRawRequest(String body, HttpServerExchange exchange) {
+    ResponseAbstract processRawRequest(String body, HttpServerExchange exchange) {
 
         exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
 

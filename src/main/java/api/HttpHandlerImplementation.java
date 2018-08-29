@@ -4,8 +4,17 @@ import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HttpString;
 import main.Main;
+import resp.general.ResponseAbstract;
 
-public abstract class HttpHandlerImplementation implements HttpHandler {
+import java.io.IOException;
+
+public class HttpHandlerImplementation implements HttpHandler {
+
+    private final API api;
+
+    HttpHandlerImplementation(API api) {
+        this.api = api;
+    }
 
     @Override
     public void handleRequest(final HttpServerExchange exchange) {
@@ -30,5 +39,19 @@ public abstract class HttpHandlerImplementation implements HttpHandler {
         );
     }
 
-    abstract void processRequest(HttpServerExchange exchange, String request);
+
+    void processRequest(HttpServerExchange exchange, String request) {
+        if(exchange.getRequestURI().replace("/", "").length() > 0)
+            try {
+                api.sendFile(exchange);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        else {
+            long timeStarted = System.currentTimeMillis();
+            ResponseAbstract response = api.processRawRequest(request, exchange);
+            String responseString = response.toJSON().put("duration", System.currentTimeMillis()-timeStarted).toString();
+            exchange.getResponseSender().send(responseString);
+        }
+    }
 }

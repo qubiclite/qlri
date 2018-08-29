@@ -1,9 +1,13 @@
 package main;
 
+import api.ApiAccount;
 import commands.param.validators.NodeAddressValidator;
 import tangle.TangleAPI;
 
+import java.security.InvalidParameterException;
 import java.text.ParseException;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Configs {
 
@@ -11,11 +15,16 @@ public class Configs {
     private String host, nodeAddress = null;
     private TangleNet net = TangleNet.TEST_NET;
     private boolean apiEnabled = false, localPowEnabled = true;
+    private final List<ApiAccount> accounts = new LinkedList<>();
 
     private static Configs instance = new Configs();
 
     public static Configs getInstance() {
         return instance;
+    }
+
+    public Iterable<ApiAccount> getAccounts() {
+        return accounts;
     }
 
     protected void processArguments(String[] args) {
@@ -75,9 +84,22 @@ public class Configs {
             case "-remotepow":
                 localPowEnabled = false;
                 break;
+            case "-u":
+                addAccount(argValue);
+                break;
             default:
                 Main.println("unknown parameter" + argName);
         }
+    }
+
+    private void addAccount(String argValue) {
+        if(argValue == null)
+            throw new NullPointerException();
+        if(!argValue.contains(":"))
+            throw new InvalidParameterException("could not add user: expected 'user:pass', actual '"+argValue+"'");
+        String username = argValue.split(":", -1)[0];
+        String password = argValue.split(":", -1)[1];
+        accounts.add(new ApiAccount(username, password));
     }
 
     public int getPort() {
