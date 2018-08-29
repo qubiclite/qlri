@@ -24,7 +24,8 @@ public class CommandIAMRead extends ComandIAMAbstract {
 
     private static final CallValidator CV = new CallValidator(new ParameterValidator[]{
             new TryteValidator(81, 81).setName("id").setExampleValue("CLUZILAWASDZAPQXWQHWRUBNXDFITUDFMBSBVAGB9PVLWDSYADZBPXCIOAYOEYAETUUNHNW9R9TZKU999").setDescription("IAM stream you want to read"),
-            new IntegerValidator(0, Integer.MAX_VALUE).setName("index").setExampleValue("17").setDescription("index from which to read the message")
+            new IntegerValidator(0, Integer.MAX_VALUE).setName("index").setExampleValue("17").setDescription("position of index from which to read the message"),
+            new TryteValidator(0, IAMIndex.MAX_KEYWORD_LENGTH).setExampleValue("RESULTS").setName("keyword").setDescription("keyword of index from which to read the message").makeOptional("")
     });
 
     @Override
@@ -58,9 +59,10 @@ public class CommandIAMRead extends ComandIAMAbstract {
 
         String iamId = (String)parMap.get("id");
         int index = (int)parMap.get("index");
+        String keyword = (String)parMap.get("keyword");
 
         IAMReader iamReader = new IAMReader(iamId);
-        JSONObject read = iamReader.read(new IAMIndex(index));
+        JSONObject read = iamReader.read(new IAMIndex(keyword, index));
 
         return new ResponseIAMRead(read);
     }
