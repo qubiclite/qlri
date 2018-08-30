@@ -9,6 +9,7 @@ import commands.param.validators.IntegerValidator;
 import commands.param.validators.NodeAddressValidator;
 import main.Configs;
 import main.Persistence;
+import tangle.NodeAddress;
 import tangle.TangleAPI;
 
 import java.util.Map;
@@ -53,17 +54,13 @@ public class CommandChangeNode extends Command {
     @Override
     public ResponseAbstract perform(Persistence persistence, Map<String, Object> parMap) {
 
-        String nodeAddress = (String)parMap.get("node_address");
+        NodeAddress nodeAddress = new NodeAddress((String)parMap.get("node_address"));
         int mwm = (int)parMap.get("min_weight_magnitude");
 
         if(mwm != TangleAPI.getInstance().getMWM())
             return new ResponseError("minWeightMagnitude change detected ("+TangleAPI.getInstance().getMWM()+" -> "+mwm+"); you cannot switch between testnet and mainnet yet");
 
-        String protocol = nodeAddress.split("://")[0];
-        String hostname = nodeAddress.split("://")[1].split(":")[0];
-        String port = nodeAddress.split("://")[1].split(":")[1];
-
-        TangleAPI.changeNode(protocol, hostname, port, mwm, Configs.getInstance().isLocalPowEnabled());
+        TangleAPI.changeNode(nodeAddress, mwm, Configs.getInstance().isLocalPowEnabled());
 
         return new ResponseSuccess();
     }

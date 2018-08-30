@@ -3,6 +3,7 @@ package main;
 import api.ApiAccount;
 import api.PrivilegedApiAccount;
 import commands.param.validators.NodeAddressValidator;
+import tangle.NodeAddress;
 import tangle.TangleAPI;
 
 import java.security.InvalidParameterException;
@@ -44,7 +45,7 @@ public class Configs {
             String nodeProtocol = address.split(":")[0];
             String nodeHost = address.split("://")[1].split(":")[0];
             String nodePort = address.split(":")[2];
-            TangleAPI.changeNode(nodeProtocol, nodeHost, nodePort, isTestnet() ? 9 : 14, localPowEnabled);
+            TangleAPI.changeNode(new NodeAddress(nodeProtocol, nodeHost, nodePort), isTestnet() ? 9 : 14, localPowEnabled);
         }
     }
 
