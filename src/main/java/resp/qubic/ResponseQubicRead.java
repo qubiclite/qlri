@@ -1,10 +1,11 @@
 package resp.qubic;
 
-import resp.general.ResponseAbstract;
 import resp.general.ResponseSuccess;
 import org.json.JSONArray;
 import qubic.QubicReader;
 import qubic.QubicSpecification;
+
+import java.util.List;
 
 public class ResponseQubicRead extends ResponseSuccess {
 
@@ -21,7 +22,9 @@ public class ResponseQubicRead extends ResponseSuccess {
         obj.put("result_period_duration", spec.getResultPeriodDuration());
         obj.put("runtime_limit", spec.getRuntimeLimit());
 
-        obj.put("assembly_list", qr.getAssemblyList());
+        List<String> assemblyList = qr.getAssemblyList();
+        if(assemblyList != null)
+            obj.put("assembly_list", assemblyList);
     }
 
     public String getID() {
@@ -34,10 +37,6 @@ public class ResponseQubicRead extends ResponseSuccess {
 
     public String getVersion() {
         return obj.getString("version");
-    }
-
-    public String getApplicationAddress() {
-        return obj.getString("application_address");
     }
 
     public long getExecutionStart() {

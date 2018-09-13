@@ -56,7 +56,7 @@ public class CommandQubicRead extends CommandQubicAbstract {
 
         println("ID:                   " + r.getID());
         println("version:              " + r.getVersion());
-        println("epoch duration:       " + epochDuration + "s (" + r.getHashPeriodDuration() + "s + " + r.getResultPeriodDuration() + "s)");
+        println("epoch duration:       " + epochDuration + "s (" + r.getHashPeriodDuration() + "s + " + r.getResultPeriodDuration() + "s), runtime limit: " + r.getRuntimeLimit());
         println("execution start:      " + Main.DF.format(1000L * r.getExecutionStart()) + " (" + r.getExecutionStart() + ", "+(r.getExecutionStart()-System.currentTimeMillis()/1000)+"s)");
 
         long timeRunning = System.currentTimeMillis()/1000-r.getExecutionStart();
