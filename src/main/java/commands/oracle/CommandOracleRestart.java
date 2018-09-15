@@ -17,11 +17,11 @@ public class CommandOracleRestart extends CommandOracleAbstract {
     public static final CommandOracleRestart instance = new CommandOracleRestart();
 
     private static final CallValidator CV = new CallValidator(new ParameterValidator[]{
-            new TryteValidator(81, 81).setName("id").setDescription("oracle ID"),
+            new TryteValidator(81, 81).setName("id").setDescription("restarts the oracle that starts with this tryte sequence"),
     });
 
     private static final CallValidator CV_TERMINAL = new CallValidator(new ParameterValidator[]{
-            new TryteValidator(1, 81).setName("id").setExampleValue("JR").setDescription("restarts the oracle that starts with this tryte sequence"),
+            new TryteValidator(1, 81).setName("id").setDescription("restarts the oracle that starts with this tryte sequence"),
     });
 
     @Override
@@ -58,7 +58,7 @@ public class CommandOracleRestart extends CommandOracleAbstract {
     @Override
     public ResponseAbstract perform(Persistence persistence, Map<String, Object> parMap) {
 
-        String oracleHandle = (String)parMap.get("oracle_handle");
+        String oracleHandle = (String)parMap.get("id");
         List<OracleWriter> ows = persistence.findAllOracleWritersWithHandle(oracleHandle);
 
         if(ows.size() != 1)
