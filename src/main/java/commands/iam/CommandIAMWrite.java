@@ -22,13 +22,15 @@ public class CommandIAMWrite extends ComandIAMAbstract {
 
     private static final CallValidator CV = new CallValidator(new ParameterValidator[]{
             new TryteValidator(81, 81).setName("ID").setExampleValue("CLUZILAWASDZAPQXWQHWRUBNXDFITUDFMBSBVAGB9PVLWDSYADZBPXCIOAYOEYAETUUNHNW9R9TZKU999").setDescription("the IAM stream in which to write"),
-            new IntegerValidator(0, Integer.MAX_VALUE).setName("index").setExampleValue("17").setDescription("index at which to write"),
-            new JSONObjectValidator().setName("message").setExampleValue("{'day': 4}").setDescription("the json object to write into the stream")
+            new IntegerValidator(0, Integer.MAX_VALUE).setName("index").setExampleValue("17").setDescription("position of the index at which to write"),
+            new JSONObjectValidator().setName("message").setExampleValue("{'day': 4}").setDescription("the json object to write into the stream"),
+            new TryteValidator(0, IAMIndex.MAX_KEYWORD_LENGTH).setName("keyword").setExampleValue("ADDRESS").makeOptional("").setDescription("keyword of the index at which to write"),
     });
 
     private static final CallValidator CV_TERMINAL = new CallValidator(new ParameterValidator[]{
             new TryteValidator(1, 81).setName("ID").setExampleValue("MB").setDescription("writes to the iam stream that starts with this tryte sequence"),
             new IntegerValidator(0, Integer.MAX_VALUE).setName("index").setExampleValue("17").setDescription("index at which to write"),
+            new TryteValidator(0, IAMIndex.MAX_KEYWORD_LENGTH).setName("keyword").setExampleValue("ADDRESS").makeOptional("").setDescription("keyword of the index at which to write"),
     });
 
     @Override
@@ -67,6 +69,7 @@ public class CommandIAMWrite extends ComandIAMAbstract {
         String id = (String)parMap.get("id");
         int index = (int)parMap.get("index");
         JSONObject message = (JSONObject)parMap.get("message");
+        String keyword = (String)parMap.get("keyword");
 
         List<IAMWriter> ips = persistence.findAllIAMStreamsWithHandle(id);
         if(ips.size() != 1)
@@ -84,7 +87,7 @@ public class CommandIAMWrite extends ComandIAMAbstract {
             }
         }
 
-        ips.get(0).write(new IAMIndex(index), message);
+        ips.get(0).write(new IAMIndex(keyword, index), message);
         return new ResponseSuccess();
     }
 }
