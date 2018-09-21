@@ -29,7 +29,13 @@ public class Main {
         // initialize
         Configs cfg = Configs.getInstance();
         cfg.processArguments(args);
-        persistence = new Persistence(cfg.isTestnet());
+        try {
+            persistence = new Persistence(cfg.isTestnet());
+        } catch (Throwable t) {
+            err("encountered error while loading persistence:");
+            t.printStackTrace();
+            println("terminating ...");
+        }
         if(cfg.isApiEnabled())
             try {
                 new API(persistence, cfg.getHost(), cfg.getPort());

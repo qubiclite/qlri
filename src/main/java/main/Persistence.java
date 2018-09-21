@@ -24,6 +24,8 @@ public class Persistence {
     private HashMap<String, IAMWriter> iamPublishers = new HashMap<>();
     private HashMap<String, App> apps = new HashMap<>();
 
+    private boolean loaded = false;
+
     public Persistence(boolean testnet) {
         persistenceFileName = (testnet ? "tn_" : "mn_")+Main.VERSION+".json";
         load();
@@ -180,6 +182,11 @@ public class Persistence {
      * Stores the current persistence state into the persistence file.
      * */
     void store() {
+        if(!loaded) {
+            Main.println("persistence was not loaded completely and will therefore not be overwritten in order to prevent data losses");
+            return;
+        }
+
         JSONObject persistenceObject = buildPersistenceObject();
         String persistenceString = persistenceObject.toString();
 
@@ -261,7 +268,8 @@ public class Persistence {
                 IAMWriter iw = new IAMWriter(iamId, privateKeyTrytes);
                 iamPublishers.put(iw.getID(), iw);
             } catch (Throwable t) {
-                Main.err("failed loading iam stream " + iamId + ": " + t.getMessage() + " ("+t.getClass().getName()+")");
+                String msg = "failed loading iam stream " + iamId;
+                throw new RuntimeException(msg, t);
             }
         }
 
@@ -277,7 +285,8 @@ public class Persistence {
                 QubicWriter qw = new QubicWriter(iw);
                 qubicWriters.put(qw.getID(), qw);
             } catch (Throwable t) {
-                Main.err("failed loading qubic " + qubicId + ": " + t.getMessage() + " ("+t.getClass().getName()+")");
+                String msg = "failed loading qubic " + qubicId;
+                throw new RuntimeException(msg, t);
             }
         }
 
@@ -299,8 +308,8 @@ public class Persistence {
             try {
                 ow = new OracleWriter(new QubicReader(qubicID), new IAMWriter(oracleID, privateKeyTrytes));
             } catch (Throwable t) {
-                Main.err("failed loading oracle " + oracleID + ": " + t.getMessage() + " ("+t.getClass().getName()+")");
-                continue;
+                String msg = "failed loading oracle " + oracleID;
+                throw new RuntimeException(msg, t);
             }
 
             oracleWriters.put(ow.getID(), ow);
@@ -314,6 +323,7 @@ public class Persistence {
         loadApps();
 
         Main.println("persistence loaded");
+        loaded = true;
     }
 
     public void loadApps() {
