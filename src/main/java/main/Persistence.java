@@ -254,6 +254,7 @@ public class Persistence {
         JSONObject persObj = readPersistenceObject();
         if(persObj == null) {
             Main.println("no persistence found, created new one");
+            loaded = true;
             return;
         }
 
