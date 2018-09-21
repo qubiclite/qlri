@@ -15,7 +15,7 @@ public class Main {
 
     public static final DateFormat DF = new SimpleDateFormat("YYYY/MMM/dd HH:mm:ss");
     public static final String VERSION = "0.5.0";
-    public static final String QLWEB_VERSION = "0.5.0";
+    public static final String QLWEB_VERSION = "0.5.1";
     private static final Scanner s = new Scanner(System.in);
 
     private static Persistence persistence;
