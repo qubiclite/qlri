@@ -35,6 +35,7 @@ public class Main {
             err("encountered error while loading persistence:");
             t.printStackTrace();
             println("terminating ...");
+            return;
         }
         if(cfg.isApiEnabled())
             try {
