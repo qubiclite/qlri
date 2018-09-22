@@ -25,6 +25,7 @@ class RequestProcessor {
     private Command command;
     private final Account account;
     private final Persistence persistence;
+    private final PrivilegedApiAccount defaultAccount = new PrivilegedApiAccount("", "");
 
     static ResponseAbstract process(Persistence persistence, String body, HttpServerExchange exchange) {
         return new RequestProcessor(persistence, body, exchange).processRawRequest();
@@ -34,7 +35,7 @@ class RequestProcessor {
         this.persistence = persistence;
         this.body = body;
         this.exchange = exchange;
-        this.account = exchange.getSecurityContext().getAuthenticatedAccount();
+        this.account = exchange.getSecurityContext() != null ? exchange.getSecurityContext().getAuthenticatedAccount() : defaultAccount;
     }
 
     private ResponseAbstract processRawRequest() {
