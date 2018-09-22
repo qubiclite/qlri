@@ -59,7 +59,7 @@ Run the docker image
 ``` shell
 docker run -it -p 17733:17733  qubiclite/qlri
 ```
-Open http://localhost:17733/ in your browser.
+Open http://localhost:17733/index.html in your browser.
 
 ## Running The Jar File
 
@@ -77,11 +77,11 @@ To make things much more intuitive, it is highly suggest to start the .jar with 
 java -jar qlri-[VERSION].jar -api
 ```
 
-This will start a **qlite web** (a web gui, see [screenshots](#screenshots)) that you can access in your browser by visiting 'http://\[YOUR IP\]:17733'. Additionally you can use `-h localhost` to
-make the GUI available on 'http://localhost:17733' only (recommended as there is no abuse/spam protection yet):
+This will start **Qlite Web** (a web gui, see [screenshots](#screenshots)) that you can access in your browser by visiting `http://[YOUR IP]:17733/index.html`. Additionally you can use `-u username:password` to
+protect your API from unauthorized access:
 
 ``` shell
-java -jar qlri-[VERSION].jar -api -h localhost
+java -jar qlri-[VERSION].jar -api -u user:pass
 ```
 
 ### Parameters
@@ -139,6 +139,7 @@ For specific information to a command (parameter details + example use), use `he
 | command | alias | what it does |
 | --- | --- | ---
 | `help`                    | `?`   | Helps the user by listing all available commands and providing details to any specific command.
+| `node_info`               | `ni`  | Gives details about this ql-node.
 | `change_node`             | `cn`  | Changes the IOTA full node used to interact with the tangle.
 | `fetch_epoch`             | `fe`  | Determines the quorum based result (consensus) of a qubic's epoch.
 | `export`                  | `ex`  | Transforms an entity (iam stream, qubic or oracle) into a string that can be imported again.
@@ -166,6 +167,7 @@ For specific information to a command (parameter details + example use), use `he
 | `app_list`                | `al`  | Lists all apps installed.
 | `app_install`             | `ai`  | Installs an app from an external source.
 | `app_uninstall`           | `au`  | Uninstalls an app.
+
 
 
 ## Screenshots
